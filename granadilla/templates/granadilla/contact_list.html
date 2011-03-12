@@ -1,0 +1,52 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{% trans "Contacts" %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; {% trans "Contacts" %}
+{% endblock %}
+
+{% block content %}
+<h2>{% trans "Contacts" %}</h2>
+
+<a href="{% url granadilla.views.contact_create %}">{% trans "Add a contact" %}</a>
+
+{% if object_list %}
+
+{% regroup object_list by last_name_initial as contact_list %} 
+
+<table class="phonebook">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{% trans "e-mail address" %}</th>
+      <th>{% trans "phone" %}</th>
+      <th>{% trans "mobile phone" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for initial in contact_list %}
+    <tr>
+      <th>{{ initial.grouper }}</th>
+    </tr>
+{% for object in initial.list %}
+    <tr>
+      <td class="name" title="{{ object.organization }}"><a href="{% url granadilla.views.contact object.pk %}">{{ object.last_name }}, {{ object.first_name }}</a></td>
+      <td class="email">{{ object.email|default_if_none:"-" }}</td>
+      <td class="phone">{{ object.phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ object.mobile_phone|default_if_none:"-" }}</td>
+      <td><a href="{% url granadilla.views.contact_card object.pk %}">vCard</a></td>
+      <td><a href="{% url granadilla.views.contact_delete object.pk %}">{% trans "Delete" %}</a></td>
+    </tr>
+{% endfor %}
+{% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+<p>{% trans "You do not have any contacts yet." %}</p>
+{% endif %}
+
+{% endblock %}

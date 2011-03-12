@@ -1,0 +1,25 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{% trans "Groups" %}{% endblock %}
+
+{% block breadcrumbs %}<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; {% trans "Groups" %}{% endblock %}
+
+{% block content %}
+<h2>{% trans "Groups" %}</h2>
+
+{% if object_list %}
+
+<ul>
+{% for group in object_list %}
+<li><a href="{% url granadilla.views.group group.name %}">{{ group }}</a></li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+<p>There are no groups yet.</p>
+
+{% endif %}
+{% endblock %}

@@ -1,0 +1,244 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-12 23:51+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: forms.py:48
+msgid "Postal address"
+msgstr "Adresse postale"
+
+#: forms.py:70 templates/granadilla/group.html:27
+msgid "Internal phone"
+msgstr "Téléphone interne"
+
+#: forms.py:71 templates/granadilla/group.html:26
+msgid "External phone"
+msgstr "Téléphone externe"
+
+#: forms.py:72 templates/granadilla/group.html:28
+msgid "Mobile phone"
+msgstr "Téléphone portable"
+
+#: forms.py:73
+msgid "Photo"
+msgstr "Photo"
+
+#: models.py:66 models.py:93 models.py:247
+msgid "name"
+msgstr "nom"
+
+#: models.py:67
+msgid "members"
+msgstr "membres"
+
+#: models.py:80
+msgid "access control list"
+msgstr "liste de contrôle d'accès"
+
+#: models.py:81
+msgid "access control lists"
+msgstr "listes de controle d'accès"
+
+#: models.py:92
+msgid "identifier"
+msgstr "identifiant"
+
+#: models.py:94
+msgid "usernames"
+msgstr "noms d'utilisateurs"
+
+#: models.py:104
+msgid "group"
+msgstr "groupe"
+
+#: models.py:105
+msgid "groups"
+msgstr "groupes"
+
+#: models.py:115 models.py:163
+msgid "first name"
+msgstr "prénom"
+
+#: models.py:116 models.py:164
+msgid "last name"
+msgstr "nom"
+
+#: models.py:117 models.py:165
+msgid "full name"
+msgstr "nom complet"
+
+#: models.py:118
+msgid "organization"
+msgstr "organisation"
+
+#: models.py:119 models.py:166 templates/granadilla/contact_list.html:24
+msgid "e-mail address"
+msgstr "adresse électronique"
+
+#: models.py:120 models.py:167 templates/granadilla/contact_list.html:25
+msgid "phone"
+msgstr "téléphone"
+
+#: models.py:121 models.py:168 templates/granadilla/contact_list.html:26
+msgid "mobile phone"
+msgstr "téléphone portable"
+
+#: models.py:122 models.py:169
+msgid "photo"
+msgstr "photo"
+
+#: models.py:123
+msgid "postal address"
+msgstr "adresse postale"
+
+#: models.py:141
+msgid "contact"
+msgstr "contact"
+
+#: models.py:142
+msgid "contacts"
+msgstr "contacts"
+
+#: models.py:172
+msgid "internal phone"
+msgstr "téléphone interne"
+
+#: models.py:175
+msgid "user id"
+msgstr "id d'utilisateur"
+
+#: models.py:176
+msgid "group id"
+msgstr "id de groupe"
+
+#: models.py:178
+msgid "home directory"
+msgstr "dossier personnel"
+
+#: models.py:179
+msgid "login shell"
+msgstr "shell de login"
+
+#: models.py:180
+msgid "username"
+msgstr "nom d'utilisateur"
+
+#: models.py:181
+msgid "password"
+msgstr "mot de passe"
+
+#: models.py:235
+msgid "user"
+msgstr "utilisateur"
+
+#: models.py:236
+msgid "users"
+msgstr "utilisateurs"
+
+#: templates/granadilla/base.html:17 templates/granadilla/contact_base.html:7
+#: templates/granadilla/contact_list.html:5
+#: templates/granadilla/contact_list.html:8
+#: templates/granadilla/contact_list.html:12
+msgid "Contacts"
+msgstr "Contacts"
+
+#: templates/granadilla/base.html:18
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: templates/granadilla/base.html:19 templates/granadilla/group.html:11
+#: templates/granadilla/group_list.html:5
+#: templates/granadilla/group_list.html:7
+#: templates/granadilla/group_list.html:10
+msgid "Groups"
+msgstr "Groupes"
+
+#: templates/granadilla/contact.html:8
+#: templates/granadilla/contact_list.html:14
+msgid "Add a contact"
+msgstr "Ajouter un contact"
+
+#: templates/granadilla/contact.html:13
+msgid "Modify"
+msgstr "Modifier"
+
+#: templates/granadilla/contact.html:13
+msgid "Add"
+msgstr "Ajouter"
+
+#: templates/granadilla/contact.html:13
+msgid "Cancel"
+msgstr "Annuler"
+
+#: templates/granadilla/contact_base.html:5
+#: templates/granadilla/contact_base.html:7
+msgid "New contact"
+msgstr "Nouveau contacts"
+
+#: templates/granadilla/contact_delete.html:5
+#, python-format
+msgid "Delete %(object)s"
+msgstr "Supprimer %(object)s"
+
+#: templates/granadilla/contact_delete.html:6
+#, python-format
+msgid "Are you sure you want to delete %(object)s?"
+msgstr "Etes-vous sûr(e) de vouloir supprimer %(object)s ?"
+
+#: templates/granadilla/contact_delete.html:10
+msgid "Yes"
+msgstr "Oui"
+
+#: templates/granadilla/contact_delete.html:15
+msgid "No"
+msgstr "Non"
+
+#: templates/granadilla/contact_list.html:41
+msgid "Delete"
+msgstr "Supprimer"
+
+#: templates/granadilla/contact_list.html:49
+msgid "You do not have any contacts yet."
+msgstr "Vous n'avez pas encore de contacts."
+
+#: templates/granadilla/group.html:66
+msgid "There are no users in this group."
+msgstr "Ce groupe ne contient aucun utilisateur."
+
+#: templates/granadilla/group.html:74
+msgid "Show photos"
+msgstr "Afficher les photos"
+
+#: templates/granadilla/group.html:76
+msgid "Show list"
+msgstr "Afficher la liste"
+
+#: templates/granadilla/user.html:17
+msgid "Remove photo"
+msgstr "Retirer la photo"
+
+#: templates/granadilla/user.html:26
+msgid "Email"
+msgstr "Courriel"
+
+#: templates/granadilla/user.html:46
+msgid "Download"
+msgstr "Télécharger"
+
+#: templatetags/granadilla_tags.py:35
+msgid "Phonebook"
+msgstr "Annuaire"

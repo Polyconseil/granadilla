@@ -1,0 +1,92 @@
+div.card {
+  width: 160px;
+  height: 220px;
+  margin: 10px;
+  padding: 5px;
+  float: left;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+div.card div.name {
+  font-weight: bold;
+  text-align: center;
+}
+div.card div.name a {
+  color: black;
+}
+
+div.card div.photo {
+  width: 120px;
+  height: 160px;
+  margin: 10px 20px;
+  overflow: hidden;
+  position: relative;
+}
+div.card div.photo div {
+  position: absolute;
+  width: 520px;
+  left: -200px;
+}
+div.card div.photo img {
+  display: block;
+  width: auto;
+  height: 160px;
+  margin: 0 auto;
+}
+
+div.card div.mobile {
+  display: inline;
+  padding: 2px 8px;
+  background-color: #ccc;
+  font-weight: bold;
+}
+
+div.card div.email {
+  overflow: hidden;
+  /*width: 120px;*/
+  padding: 8px 8px;
+}
+
+div.clear {
+  clear: left;
+}
+
+.contact button {
+  margin-right: 10px;
+}
+
+.contact input, .contact textarea {
+  width: 300px;
+}
+
+.phonebook {
+  width: 100%;
+}
+
+.phonebook tr:hover {
+  background: #d0f0ff;
+}
+
+.phone {
+  text-align: center;
+}
+
+/* toolbox icons */
+
+.phonebook-contact {
+  background: url(../img/contact.png);
+}
+
+.phonebook-image {
+  background: url(../img/image.png);
+}
+
+.phonebook-group {
+  background: url(../img/group.png);
+}
+
+.phonebook-user {
+  background: url(../img/user.png);
+}
+

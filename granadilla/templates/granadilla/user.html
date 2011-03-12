@@ -1,0 +1,53 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{{ object }}{% endblock %}
+
+{% block breadcrumbs %}<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; {{ object }}{% endblock %}
+
+{% block content %}
+<table class="module">
+<caption>{{ object }}</caption>
+<tr>
+<td>
+  <img src="{% url granadilla.views.photo object.pk %}"/>
+{% if object.photo and can_edit %}
+  <p>
+    <a href="{% url granadilla.views.photo_delete object.pk %}">{% trans "Remove photo" %}</a>
+  </p>
+{% endif %}
+</td>
+<td>
+  <form enctype="multipart/form-data" method="POST">
+  {% csrf_token %}
+  <table>
+  <tr>
+    <th>{% trans "Email" %}:</th>
+    <td><a href="mailto:{{ object.email }}">{{ object.email }}</a></td>
+  </tr>
+{% if can_edit %}
+  {{ form }}
+  <tr>
+    <td>&nbsp;</td><td><input type="submit"/></td>
+  </tr>
+{% else %}
+  {% for f in form %}
+  {% ifnotequal f.name "photo" %}
+  <tr>
+    <th>{{ f.label }}:</th>
+    <td>{% field_value f %}</td>
+  </tr>
+  {% endifnotequal %}
+  {% endfor %}
+{% endif %}
+  <tr>
+    <th>vCard:</th>
+    <td><a href="{% url granadilla.views.user_card object.pk %}">{% trans "Download" %}</a></td>
+  </tr>
+  </table>
+  </form>
+</td>
+</tr>
+</table>
+{% endblock %}

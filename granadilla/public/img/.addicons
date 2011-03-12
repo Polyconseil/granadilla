@@ -1,0 +1,11 @@
+{
+'height': 24,
+'width': 24,
+'source': '/usr/share/icons/oxygen/scalable',
+'icons': {
+    'contact': 'actions/view-pim-contacts.svgz',
+    'image': 'actions/view-preview.svgz',
+    'group': 'apps/system-users.svgz',
+    'user': 'places/user-identity.svgz',
+},
+}

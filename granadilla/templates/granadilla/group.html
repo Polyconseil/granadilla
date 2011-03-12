@@ -1,0 +1,79 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{{ group }}{% endblock %}
+
+{% block breadcrumbs %}
+{% if home %}
+{% granadilla_title %}
+{% else %}
+<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url granadilla.views.groups %}">{% trans "Groups" %}</a> &rsaquo; {{ group }}
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2>{{ group }}</h2>
+
+{% if object_list %}
+
+{% if printable %}
+
+<table class="phonebook">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{% trans "External phone" %}</th>
+      <th>{% trans "Internal phone" %}</th>
+      <th>{% trans "Mobile phone" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for object in object_list %}
+    <tr>
+      <td class="name"><a href="{% url granadilla.views.user object.pk %}">{{ object }}</a></td>
+      <td class="phone">{{ object.phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ object.internal_phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ object.mobile_phone|default_if_none:"-" }}</td>
+    </tr>
+{% endfor %}
+  </tbody>
+</table>
+
+{% else %}
+
+{% for object in object_list %}
+<div class="card">
+  <div class="name">
+    <a href="{% url granadilla.views.user object.pk %}">{{ object }}</a>
+  </div>
+  <div class="photo">
+    <div class="centering">
+      <a href="{% url granadilla.views.user object.pk %}"><img src="{% url granadilla.views.photo object.pk %}" alt="{{ object }}" /></a>
+    </div>
+  </div>
+  {% if object.mobile_phone %}
+  <div class="mobile">{{ object.mobile_phone }}</div>
+  {% endif %}
+</div>
+{% endfor %}
+
+<div class="clear"></div>
+
+{% endif %}
+
+{% else %}
+<p>{% trans "There are no users in this group." %}</p>
+{% endif %}
+
+{% endblock %}
+
+{% block links %}
+<li class="phonebook-image">
+{% if printable %}
+  <a href="{% url granadilla.views.group group.name %}">{% trans "Show photos" %}</a>
+{% else %}
+  <a href="{% url granadilla.views.group_print group.name %}">{% trans "Show list" %}</a>
+{% endif %}
+</li>
+{% endblock %}
