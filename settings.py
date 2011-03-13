@@ -36,7 +36,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.dirname(__file__) + '/public/'
+MEDIA_ROOT = os.path.dirname(__file__) + '/granadilla/public/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -92,3 +92,4 @@ LDAPDB_SERVER_URI="ldap://"
 GRANADILLA_LDAP_BASE_DN = "dc=nodomain"
 GRANADILLA_LDAP_MAIL_DOMAIN = "example.com"
 GRANADILLA_LDAP_USERS_GROUP = "test"
+GRANADILLA_MEDIA_PREFIX = MEDIA_URL
