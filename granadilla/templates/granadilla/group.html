@@ -24,8 +24,8 @@
     <tr>
       <th></th>
       <th>{% trans "phone" %}</th>
-      <th>{% trans "internal phone" %}</th>
       <th>{% trans "mobile phone" %}</th>
+      <th>{% trans "internal phone" %}</th>
     </tr>
   </thead>
   <tbody>
@@ -33,8 +33,8 @@
     <tr>
       <td class="name"><a href="{% url granadilla.views.user object.pk %}">{{ object }}</a></td>
       <td class="phone">{{ object.phone|default_if_none:"-" }}</td>
-      <td class="phone">{{ object.internal_phone|default_if_none:"-" }}</td>
       <td class="phone">{{ object.mobile_phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ object.internal_phone|default_if_none:"-" }}</td>
     </tr>
 {% endfor %}
   </tbody>
