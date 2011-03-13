@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-13 03:06+0100\n"
+"POT-Creation-Date: 2011-03-13 03:10+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,18 +22,6 @@ msgid "Postal address"
 msgstr "Adresse postale"
 
 #: forms.py:70
-msgid "Internal phone"
-msgstr "Téléphone interne"
-
-#: forms.py:71
-msgid "External phone"
-msgstr "Téléphone externe"
-
-#: forms.py:72
-msgid "Mobile phone"
-msgstr "Téléphone portable"
-
-#: forms.py:73
 msgid "Photo"
 msgstr "Photo"
 

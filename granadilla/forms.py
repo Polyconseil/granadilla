@@ -26,24 +26,6 @@ from django.utils.translation import ugettext as _
 
 from granadilla.models import LdapContact, LdapUser
 
-internal_phone_re = re.compile('^[0-9]{2} [0-9]{2}$')
-phone_re = re.compile('^\+[0-9]{2,3}( [0-9]+)+$')
-
-class PhoneNumberField(forms.CharField):
-    def __init__(self, format=phone_re, **kwargs):
-        super(PhoneNumberField, self).__init__(**kwargs)
-        self.format = format
-
-    def clean(self, value):
-        value = super(PhoneNumberField, self).clean(value)
-        if not value:
-            return value
-
-        if not self.format.match(value):
-            raise forms.ValidationError('%s is not a valid phone number.' % value) 
-
-        return value
-
 class LdapContactForm(forms.ModelForm):
     postal_address = forms.CharField(required=False, label=_("Postal address"), widget=forms.Textarea)
 
@@ -67,9 +49,6 @@ class LdapContactForm(forms.ModelForm):
         exclude = ("dn", "photo", "full_name")
 
 class LdapUserForm(forms.ModelForm):
-    internal_phone = PhoneNumberField(format=internal_phone_re, required=False, label=_("Internal phone"), help_text="Example: 11 22")
-    phone = PhoneNumberField(required=False, label=_("External phone"), help_text="Example: +33 1 22 33 44 55")
-    mobile_phone = PhoneNumberField(required=False, label=_("Mobile phone"), help_text="Example: +33 6 77 88 99 00")
     new_photo = forms.ImageField(required=False, label=_("Photo"))
 
     def save(self, commit=True):
@@ -83,4 +62,4 @@ class LdapUserForm(forms.ModelForm):
 
     class Meta:
         model = LdapUser
-        fields = ('internal_phone', 'phone', 'mobile_phone', 'new_photo')
+        fields = ('phone', 'mobile_phone', 'internal_phone', 'new_photo')
