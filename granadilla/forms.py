@@ -70,8 +70,17 @@ class LdapUserForm(forms.ModelForm):
     internal_phone = PhoneNumberField(format=internal_phone_re, required=False, label=_("Internal phone"), help_text="Example: 11 22")
     phone = PhoneNumberField(required=False, label=_("External phone"), help_text="Example: +33 1 22 33 44 55")
     mobile_phone = PhoneNumberField(required=False, label=_("Mobile phone"), help_text="Example: +33 6 77 88 99 00")
-    photo = forms.ImageField(required=False, label=_("Photo"))
+    new_photo = forms.ImageField(required=False, label=_("Photo"))
+
+    def save(self, commit=True):
+        contact = super(LdapUserForm, self).save(False)
+        photo = self.cleaned_data['new_photo']
+        if hasattr(photo, 'read'):
+            contact.photo = photo.read()
+        if commit:
+            contact.save()
+        return contact
 
     class Meta:
         model = LdapUser
-        fields = ('internal_phone', 'phone', 'mobile_phone', 'photo')
+        fields = ('internal_phone', 'phone', 'mobile_phone', 'new_photo')
