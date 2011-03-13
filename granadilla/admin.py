@@ -19,7 +19,7 @@
 #
 
 from django.contrib import admin
-from granadilla.models import LdapAcl, LdapGroup, LdapUser, ACLS_DN, USERS_SAMBA
+from granadilla.models import LdapAcl, LdapGroup, LdapUser, ACLS_DN
 
 class LdapAclAdmin(admin.ModelAdmin):
     exclude = ['dn', 'members']
@@ -30,9 +30,18 @@ class LdapGroupAdmin(admin.ModelAdmin):
     search_fields = ['name']
 
 class LdapUserAdmin(admin.ModelAdmin):
-    exclude = ['dn', 'password', 'photo']
-    if USERS_SAMBA:
-        exclude += ['samba_ntpassword', 'samba_lmpassword', 'samba_pwdlastset']
+    fieldsets = (
+        (None, {
+            'fields': ('first_name', 'last_name', 'full_name'),
+        }),
+        ('Posix account', {
+            'fields': ('username', 'uid', 'group', 'gecos', 'home_directory', 'login_shell')
+        }),
+        ('Personal info', {
+            'classes': ('collapse',),
+            'fields': ('email', 'phone', 'mobile_phone', 'internal_phone'),
+        }),
+    )
     list_display = ['username', 'first_name', 'last_name', 'email', 'uid']
     search_fields = ['first_name', 'last_name', 'full_name', 'username']
 
