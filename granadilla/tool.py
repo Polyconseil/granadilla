@@ -26,7 +26,7 @@ import sys
 
 from django.db.models.signals import post_save, post_delete
 
-from granadilla.models import LdapAcl, LdapGroup, LdapUser, LdapOrganizationalUnit, ACLS_DN, MAIL_DOMAIN, USERS_DN, USERS_MAILMAP, USERS_SAMBA, GROUPS_DN, GROUPS_MAILMAP
+from granadilla.models import LdapAcl, LdapGroup, LdapUser, LdapOrganizationalUnit, ACLS_DN, MAIL_DOMAIN, USERS_DN, USERS_GROUP, USERS_MAILMAP, USERS_SAMBA, GROUPS_DN, GROUPS_MAILMAP
 
 POSTMAP = "/usr/sbin/postmap"
 
@@ -221,6 +221,7 @@ class Tool(object):
         """
         Initialise the LDAP directory.
         """
+        # create organizational units
         for dn in [ USERS_DN, GROUPS_DN, ACLS_DN ]:
             if not dn:
                 continue
@@ -233,6 +234,12 @@ class Tool(object):
                 ou = LdapOrganizationalUnit()
                 ou.name = name
                 ou.save()
+
+        # create default group
+        try:
+            LdapGroup.objects.get(name=USERS_GROUP)
+        except:
+            self.addgroup(USERS_GROUP)
 
     def lsgroup(self, groupname=None):
         """
