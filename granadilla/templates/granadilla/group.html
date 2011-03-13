@@ -49,7 +49,7 @@
   </div>
   <div class="photo">
     <div class="centering">
-      <a href="{% url granadilla.views.user object.pk %}"><img src="{% url granadilla.views.photo object.pk %}" alt="{{ object }}" /></a>
+      <a href="{% url granadilla.views.user object.pk %}"><img src="{% if object.photo %}{% url granadilla.views.photo object.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}" alt="{{ object }}" /></a>
     </div>
   </div>
   {% if object.mobile_phone %}

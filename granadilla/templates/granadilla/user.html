@@ -11,7 +11,7 @@
 <caption>{{ object }}</caption>
 <tr>
 <td>
-  <img src="{% url granadilla.views.photo object.pk %}"/>
+  <img src="{% if object.photo %}{% url granadilla.views.photo object.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}"/>
 {% if object.photo and can_edit %}
   <p>
     <a href="{% url granadilla.views.photo_delete object.pk %}">{% trans "Remove photo" %}</a>
