@@ -163,7 +163,7 @@ class LdapUser(Model):
     first_name = CharField(_('first name'), db_column='givenName')
     last_name = CharField(_('last name'), db_column='sn')
     full_name = CharField(_('full name'), db_column='cn')
-    email = CharField(_('e-mail address'), db_column='mail')
+    email = CharField(_('e-mail address'), db_column='mail', blank=True)
     phone = CharField(_('phone'), db_column='telephoneNumber', blank=True)
     mobile_phone = CharField(_('mobile phone'), db_column='mobile', blank=True)
     photo = ImageField(_('photo'), db_column='jpegPhoto')
