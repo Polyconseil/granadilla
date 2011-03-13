@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-12 23:51+0100\n"
+"POT-Creation-Date: 2011-03-13 03:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,15 +21,15 @@ msgstr ""
 msgid "Postal address"
 msgstr "Adresse postale"
 
-#: forms.py:70 templates/granadilla/group.html:27
+#: forms.py:70
 msgid "Internal phone"
 msgstr "Téléphone interne"
 
-#: forms.py:71 templates/granadilla/group.html:26
+#: forms.py:71
 msgid "External phone"
 msgstr "Téléphone externe"
 
-#: forms.py:72 templates/granadilla/group.html:28
+#: forms.py:72
 msgid "Mobile phone"
 msgstr "Téléphone portable"
 
@@ -90,10 +90,12 @@ msgid "e-mail address"
 msgstr "adresse électronique"
 
 #: models.py:120 models.py:167 templates/granadilla/contact_list.html:25
+#: templates/granadilla/group.html:26
 msgid "phone"
 msgstr "téléphone"
 
 #: models.py:121 models.py:168 templates/granadilla/contact_list.html:26
+#: templates/granadilla/group.html:28
 msgid "mobile phone"
 msgstr "téléphone portable"
 
@@ -113,7 +115,7 @@ msgstr "contact"
 msgid "contacts"
 msgstr "contacts"
 
-#: models.py:172
+#: models.py:172 templates/granadilla/group.html:27
 msgid "internal phone"
 msgstr "téléphone interne"
 
