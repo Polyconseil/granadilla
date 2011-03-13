@@ -240,11 +240,11 @@ class LdapOrganizationalUnit(Model):
     Class for representing an LDAP organization unit entry.
     """
     # LDAP meta-data
-    dn = BASE_DN
+    base_dn = BASE_DN
     object_classes = ['organizationalUnit']
 
     # organizationalUnit
-    name = CharField(_('name'), db_column='ou')
+    name = CharField(_('name'), db_column='ou', primary_key=True)
 
 if __name__ == "__main__":
     import doctest

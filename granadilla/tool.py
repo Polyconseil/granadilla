@@ -229,7 +229,7 @@ class Tool(object):
             name = dn.split(",")[0].split("=")[1]
             try:
                 ou = LdapOrganizationalUnit.objects.get(name=name)
-            except:
+            except LdapOrganizationalUnit.DoesNotExist:
                 ou = LdapOrganizationalUnit()
                 ou.name = name
                 ou.save()

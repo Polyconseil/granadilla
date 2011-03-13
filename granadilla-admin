@@ -1,0 +1,3 @@
+#!/bin/sh
+BASE=`dirname $0`
+DJANGO_SETTINGS_MODULE=settings PYTHONPATH=$BASE python $BASE/granadilla/tool.py "$@"
