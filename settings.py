@@ -89,7 +89,21 @@ LDAPDB_BIND_DN="cn=admin,dc=nodomain"
 LDAPDB_BIND_PASSWORD="test"
 LDAPDB_SERVER_URI="ldap://"
 
+# Base DN for LDAP database.
 GRANADILLA_LDAP_BASE_DN = "dc=nodomain"
+
+# Domain to automatically generate e-mail addresses for new users.
 GRANADILLA_LDAP_MAIL_DOMAIN = "example.com"
+
+# The "base" group which is displayed in the index view.
 GRANADILLA_LDAP_USERS_GROUP = "test"
+
+# URL from which Granadilla's static media are served.
 GRANADILLA_MEDIA_PREFIX = MEDIA_URL
+
+# Optional Postfix map file in which to write group "mailing lists".
+# GRANADILLA_LDAP_GROUPS_MAILMAP = "/etc/postfix/nodomain-groups"
+
+# Optional Postfix map file in which to write user aliases of the form:
+# firstname.lastname@domain => user@domain
+# GRANADILLA_LDAP_USERS_MAILMAP = "/etc/postfix/nodomain-users"
