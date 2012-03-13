@@ -46,7 +46,10 @@ def granadilla_media(medium):
     try:
         prefix = settings.GRANADILLA_MEDIA_PREFIX
     except:
-        prefix = os.path.join(settings.MEDIA_URL, 'granadilla')
+        try:
+            prefix = os.path.join(settings.STATIC_URL, 'granadilla')
+        except:
+            prefix = os.path.join(settings.MEDIA_URL, 'granadilla')
     return os.path.join(prefix, medium)
 register.simple_tag(granadilla_media)
 
