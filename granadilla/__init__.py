@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 # django-granadilla
-# Copyright (C) 2009-2011 Bolloré telecom
+# Copyright (C) 2009-2012 Bolloré telecom
 # See AUTHORS file for a full list of contributors.
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -27,9 +27,9 @@ Granadilla
 __docformat__ = 'epytext en'
 
 __version__ = '0.1.0'
-__url__ = 'https://intranet.bolloretelecom.eu/projects/django-granadilla/'
-__copyright__ = '(C) 2009 Bolloré Telecom'
+__url__ = 'https://opensource.bolloretelecom.eu/projects/django-granadilla/'
+__copyright__ = '(C) 2009-2012 Bolloré Telecom'
 __license__ = 'GPL'
 __license_long__ = """
- Copyright (C) 2009 Bolloré Telecom
+ Copyright (C) 2009-2012 Bolloré Telecom
   All rights reserved."""
