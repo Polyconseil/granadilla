@@ -41,6 +41,7 @@ CONTACTS_DN = getattr(settings, "GRANADILLA_LDAP_CONTACTS_DN", "ou=contacts," + 
 GROUPS_DN = getattr(settings, "GRANADILLA_LDAP_GROUPS_DN", "ou=groups," + BASE_DN)
 ACLS_DN = getattr(settings, "GRANADILLA_LDAP_ACLS_DN", "ou=groupacls," + BASE_DN)
 USERS_DN = getattr(settings, "GRANADILLA_LDAP_USERS_DN", "ou=people," + BASE_DN)
+SERVERS_DN = getattr(settings, "GRANADILLA_LDAP_SERVERS_DN", "ou=servers," + BASE_DN)
 USERS_GROUP = getattr(settings, "GRANADILLA_LDAP_USERS_GROUP")
 USERS_HOME = getattr(settings, "GRANADILLA_LDAP_USERS_HOME", "/home")
 USERS_SHELL = getattr(settings, "GRANADILLA_LDAP_USERS_SHELL", "/bin/bash")
@@ -140,6 +141,28 @@ class LdapContact(Model):
         ordering = ('last_name', 'first_name')
         verbose_name = _('contact')
         verbose_name_plural = _('contacts')
+
+
+class LdapServer(Model):
+    """Class for a Server."""
+    # LDAP meta-data
+    base_dn = SERVERS_DN
+    object_classes = ['ipHost']
+
+    name = CharField(_('name'), db_column='cn')
+    ip_address = CharField(_('IP address'), db_column='ipHostNumber')
+    description = CharField(_('description'), db_column='description')
+
+    class Meta:
+        verbose_name = _('server')
+        verbose_name_plural = _('servers')
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
 
 class LdapUser(Model):
     """
