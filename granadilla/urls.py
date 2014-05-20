@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('',
     (r'^$', 'granadilla.views.index'),
@@ -28,8 +28,8 @@ urlpatterns = patterns('',
     (r'^contacts/(?P<contact_id>[^/]+)/card/$', 'granadilla.views.contact_card'),
     (r'^contacts/(?P<contact_id>[^/]+)/delete/$', 'granadilla.views.contact_delete'),
     (r'^groups/$', 'granadilla.views.groups'),
-    (r'^group/(?P<gid>.*)/print/$', 'granadilla.views.group_print'),
-    (r'^group/(?P<gid>.*)/$', 'granadilla.views.group'),
+    (r'^group/(?P<slug>.*)/print/$', 'granadilla.views.group_print'),
+    (r'^group/(?P<slug>.*)/$', 'granadilla.views.group'),
     (r'^user/(?P<uid>.*)/card/$', 'granadilla.views.user_card'),
     (r'^user/(?P<uid>.*)/photo/$', 'granadilla.views.photo'),
     (r'^user/(?P<uid>.*)/photo/delete/$', 'granadilla.views.photo_delete'),

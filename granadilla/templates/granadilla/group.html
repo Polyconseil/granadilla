@@ -8,14 +8,14 @@
 {% if home %}
 {% granadilla_title %}
 {% else %}
-<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url granadilla.views.groups %}">{% trans "Groups" %}</a> &rsaquo; {{ group }}
+<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url "granadilla.views.groups" %}">{% trans "Groups" %}</a> &rsaquo; {{ group }}
 {% endif %}
 {% endblock %}
 
 {% block content %}
 <h2>{{ group }}</h2>
 
-{% if object_list %}
+{% if members %}
 
 {% if printable %}
 
@@ -29,12 +29,12 @@
     </tr>
   </thead>
   <tbody>
-{% for object in object_list %}
+{% for member in members %}
     <tr>
-      <td class="name"><a href="{% url granadilla.views.user object.pk %}">{{ object }}</a></td>
-      <td class="phone">{{ object.phone|default_if_none:"-" }}</td>
-      <td class="phone">{{ object.mobile_phone|default_if_none:"-" }}</td>
-      <td class="phone">{{ object.internal_phone|default_if_none:"-" }}</td>
+      <td class="name"><a href="{% url "granadilla.views.user" member.pk %}">{{ member }}</a></td>
+      <td class="phone">{{ member.phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ member.mobile_phone|default_if_none:"-" }}</td>
+      <td class="phone">{{ member.internal_phone|default_if_none:"-" }}</td>
     </tr>
 {% endfor %}
   </tbody>
@@ -42,18 +42,18 @@
 
 {% else %}
 
-{% for object in object_list %}
+{% for member in members %}
 <div class="card">
   <div class="name">
-    <a href="{% url granadilla.views.user object.pk %}">{{ object }}</a>
+    <a href="{% url "granadilla.views.user" member.pk %}">{{ member }}</a>
   </div>
   <div class="photo">
     <div class="centering">
-      <a href="{% url granadilla.views.user object.pk %}"><img src="{% if object.photo %}{% url granadilla.views.photo object.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}" alt="{{ object }}" /></a>
+      <a href="{% url "granadilla.views.user" member.pk %}"><img src="{% if member.photo %}{% url "granadilla.views.photo" member.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}" alt="{{ member }}" /></a>
     </div>
   </div>
-  {% if object.mobile_phone %}
-  <div class="mobile">{{ object.mobile_phone }}</div>
+  {% if member.mobile_phone %}
+  <div class="mobile">{{ member.mobile_phone }}</div>
   {% endif %}
 </div>
 {% endfor %}
@@ -71,9 +71,9 @@
 {% block links %}
 <li class="phonebook-image">
 {% if printable %}
-  <a href="{% url granadilla.views.group group.name %}">{% trans "Show photos" %}</a>
+  <a href="{% url "granadilla.views.group" group.name %}">{% trans "Show photos" %}</a>
 {% else %}
-  <a href="{% url granadilla.views.group_print group.name %}">{% trans "Show list" %}</a>
+  <a href="{% url "granadilla.views.group_print" group.name %}">{% trans "Show list" %}</a>
 {% endif %}
 </li>
 {% endblock %}

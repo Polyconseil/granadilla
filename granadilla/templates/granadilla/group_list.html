@@ -4,7 +4,7 @@
 
 {% block subtitle %}{% trans "Groups" %}{% endblock %}
 
-{% block breadcrumbs %}<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; {% trans "Groups" %}{% endblock %}
+{% block breadcrumbs %}<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Groups" %}{% endblock %}
 
 {% block content %}
 <h2>{% trans "Groups" %}</h2>
@@ -13,7 +13,7 @@
 
 <ul>
 {% for group in object_list %}
-<li><a href="{% url granadilla.views.group group.name %}">{{ group }}</a></li>
+<li><a href="{% url "granadilla.views.group" group.name %}">{{ group }}</a></li>
 {% endfor %}
 </ul>
 

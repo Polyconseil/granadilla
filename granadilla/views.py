@@ -19,7 +19,6 @@
 #
 
 import time
-import vobject
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -29,13 +28,12 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpRespons
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.utils.http import http_date
-from django.views.generic import create_update, list_detail
-from django.views.generic.simple import redirect_to
 from django.views.static import was_modified_since
-from templatetags.granadilla_tags import granadilla_media
+from django.views import generic as generic_views
 
+from granadilla.templatetags.granadilla_tags import granadilla_media
 from granadilla.forms import LdapContactForm, LdapUserForm
-from granadilla.models import LdapContact, LdapGroup, LdapUser, CONTACTS_DN
+from . import models
 
 def can_write(user, entry):
     """
@@ -49,11 +47,12 @@ def can_write(user, entry):
     return can_edit
 
 def get_contacts(user):
-    base_dn = "ou=%s,%s" % (user.username, CONTACTS_DN)
-    return LdapContact.scoped(base_dn)
+    base_dn = "ou=%s,%s" % (user.username, models.CONTACTS_DN)
+    return models.LdapContact.scoped(base_dn)
 
 def vcard(user):
     """Return the vCard for a contact."""
+    import vobject
     card = vobject.vCard()
     card.add('n')
     card.n.value = vobject.vcard.Name(given=user.first_name, family=user.last_name)
@@ -86,87 +85,110 @@ def vcard(user):
     
 @login_required
 def index(request, template_name='granadilla/facebook.html'):
-    return group(request, settings.GRANADILLA_LDAP_USERS_GROUP)
+    return group(request, pk=settings.GRANADILLA_LDAP_USERS_GROUP)
 
-@login_required
-def contact(request, contact_id):
-    contact = get_contacts(request.user).objects.get(pk=contact_id)
-    if request.method == 'POST':
-        form = LdapContactForm(request.POST, instance=contact)
-        if form.is_valid():
-            form.save()
-            return redirect_to(request, reverse(contact_list))
-    else:
-        form = LdapContactForm(instance=contact)
-    return render_to_response('granadilla/contact.html', RequestContext(request, {
-        'object': contact,
-        'form': form,
-    }))
 
 @login_required
 def contact_card(request, contact_id):
     contact = get_contacts(request.user).objects.get(pk=contact_id)
     return vcard(contact)
 
-@login_required
-def contact_create(request):
-    base_dn = "ou=%s,%s" % (request.user.username, CONTACTS_DN)
-    if request.method == 'POST':
-        form = LdapContactForm(request.POST, base_dn=base_dn)
-        if form.is_valid():
-            form.save()
-            return redirect_to(request, reverse(contact_list))
-    else:
-        form = LdapContactForm(base_dn=base_dn)
-    return render_to_response('granadilla/contact.html', RequestContext(request, {
-        'form': form,
-    }))
 
-@login_required
-def contact_delete(request, contact_id):
-    contact = get_contacts(request.user).objects.get(pk=contact_id)
-    if request.method == 'POST':
-        contact.delete()
-        return redirect_to(request, reverse(contact_list))
-    else:
-        return render_to_response('granadilla/contact_delete.html', RequestContext(request, {'object': contact}))
+class ContactCreate(generic_views.CreateView):
+    model = models.LdapContact
+    template_name = 'granadilla/contact.html'
 
-@login_required
-def contact_list(request):
-    return list_detail.object_list(request,
-        queryset=get_contacts(request.user).objects.all(),
-        template_name="granadilla/contact_list.html")
+    form_class = LdapContactForm
 
-@login_required
-def group(request, gid, printable=False):
-    """
-    Display the list of users belonging to a group.
-    """
-    group = get_object_or_404(LdapGroup, pk=gid)
-    return list_detail.object_list(request,
-        queryset=LdapUser.objects.filter(username__in=group.usernames),
-        template_name="granadilla/group.html",
-        extra_context={
-            'home': group.name == settings.GRANADILLA_LDAP_USERS_GROUP,
-            'group': group,
-            'printable': printable,
+    def get_form_kwargs(self):
+        base_dn = 'ou=%s,%s' % (self.request.user.username, models.CONTACTS_DN)
+        kwargs = super(ContactCreate, self).get_form_kwargs()
+        kwargs['base_dn'] = base_dn
+        return kwargs
+
+    def get_success_url(self):
+        return reverse(contact_list)
+
+contact_create = login_required(ContactCreate.as_view())
+
+
+class ContactUpdate(generic_views.UpdateView):
+    model = models.LdapContact
+    template_name = 'granadilla/contact.html'
+    form_class = LdapContactForm
+
+    def get_queryset(self):
+        return get_contacts(self.request.user).objects.all()
+
+contact = login_required(ContactUpdate.as_view())
+
+
+class ContactDelete(generic_views.DeleteView):
+    model = models.LdapContact
+    template_name = 'granadilla/contact_delete.html'
+
+    def get_queryset(self):
+        return get_contacts(self.request.user).objects.all()
+
+    def get_success_url(self):
+        return reverse(contact_list)
+
+
+contact_delete = login_required(ContactDelete.as_view())
+
+
+class ContactListView(generic_views.ListView):
+    model = models.LdapContact
+    template_name = 'granadilla/contact_list.html'
+
+    def get_queryset(self):
+        return get_contacts(self.request.user).objects.all()
+
+
+contact_list = login_required(ContactListView.as_view())
+
+
+class GroupView(generic_views.DetailView):
+    model = models.LdapGroup
+    template_name = 'granadilla/group.html'
+    printable = False
+    slug_field = 'name'
+
+    def get_context_data(self, **kwargs):
+        ctxt = super(GroupView, self).get_context_data(**kwargs)
+        ctxt.update({
+            'printable': self.printable,
+            'home': self.object.name == settings.GRANADILLA_LDAP_USERS_GROUP,
+            'group': self.object,
+            'members': models.LdapUser.objects.filter(xelMemberOf=self.object.dn),
         })
+        return ctxt
 
-@login_required
-def group_print(request, gid):
-    """
-    Display a printable list of users belonging to a group.
-    """
-    return group(request, gid, printable=True)
 
-@login_required
-def groups(request):
+group = login_required(GroupView.as_view())
+
+
+
+class PrintableGroupView(GroupView):
+    printable = True
+
+
+"""
+Display a printable list of users belonging to a group.
+"""
+group_print = login_required(PrintableGroupView.as_view())
+
+
+class GroupsView(generic_views.ListView):
     """
     Display the list of groups.
     """
-    return list_detail.object_list(request,
-        queryset=LdapGroup.objects.all(),
-        template_name="granadilla/group_list.html")
+    model = models.LdapGroup
+    template_name = 'granadilla/group_list.html'
+
+
+groups = login_required(GroupsView.as_view())
+
 
 @login_required
 def photo(request, uid):
@@ -175,7 +197,7 @@ def photo(request, uid):
     if not was_modified_since(request.META.get('HTTP_IF_MODIFIED_SINCE'), now - max_age):
         return HttpResponseNotModified()
 
-    user = get_object_or_404(LdapUser, pk=uid)
+    user = get_object_or_404(models.LdapUser, pk=uid)
     if not user.photo:
         return HttpResponseRedirect(granadilla_media('img/unknown.png'))
     response = HttpResponse()
@@ -187,7 +209,7 @@ def photo(request, uid):
     return response
 
 def photo_delete(request, uid):
-    user = get_object_or_404(LdapUser, pk=uid)
+    user = get_object_or_404(models.LdapUser, pk=uid)
     if not can_write(request.user, user):
         raise PermissionDenied
 
@@ -202,7 +224,7 @@ def photo_delete(request, uid):
 
 @login_required
 def user(request, uid):
-    user = get_object_or_404(LdapUser, pk=uid)
+    user = get_object_or_404(models.LdapUser, pk=uid)
 
     # set permissions
     can_edit = can_write(request.user, user)
@@ -226,6 +248,6 @@ def user(request, uid):
 
 @login_required
 def user_card(request, uid):
-    user = get_object_or_404(LdapUser, pk=uid)
+    user = get_object_or_404(models.LdapUser, pk=uid)
     return vcard(user)
  
