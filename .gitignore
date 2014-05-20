@@ -1,5 +1,6 @@
 # Local, password-full
 local_settings.ini
+demo/db.sqlite3
 
 # Temporary files
 .*.swp
@@ -8,6 +9,7 @@ local_settings.ini
 __pycache__/
 
 # Build-related files
+demo/static
 docs/_build/
 .coverage
 .tox
