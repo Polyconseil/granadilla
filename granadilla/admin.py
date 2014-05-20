@@ -19,15 +19,22 @@
 #
 
 from django.contrib import admin
-from granadilla.models import LdapAcl, LdapGroup, LdapUser, ACLS_DN
+from . import models
 
 class LdapAclAdmin(admin.ModelAdmin):
     exclude = ['dn', 'members']
+
+if models.ACLS_DN:
+    admin.site.register(models.LdapAcl, LdapAclAdmin)
+
 
 class LdapGroupAdmin(admin.ModelAdmin):
     exclude = ['dn', 'usernames']
     list_display = ['name', 'gid']
     search_fields = ['name']
+
+admin.site.register(models.LdapGroup, LdapGroupAdmin)
+
 
 class LdapUserAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -45,7 +52,12 @@ class LdapUserAdmin(admin.ModelAdmin):
     list_display = ['username', 'first_name', 'last_name', 'email', 'uid']
     search_fields = ['first_name', 'last_name', 'full_name', 'username']
 
-if ACLS_DN:
-    admin.site.register(LdapAcl, LdapAclAdmin)
-admin.site.register(LdapGroup, LdapGroupAdmin)
-admin.site.register(LdapUser, LdapUserAdmin)
+admin.site.register(models.LdapUser, LdapUserAdmin)
+
+
+class LdapServerAdmin(admin.ModelAdmin):
+    exclude = ['dn']
+    list_display = ['name', 'ip_address', 'description']
+    search_fields = ['name', 'description']
+
+admin.site.register(models.LdapServer, LdapServerAdmin)

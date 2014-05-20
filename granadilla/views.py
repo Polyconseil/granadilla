@@ -160,7 +160,7 @@ class GroupView(generic_views.DetailView):
             'printable': self.printable,
             'home': self.object.name == settings.GRANADILLA_LDAP_USERS_GROUP,
             'group': self.object,
-            'members': models.LdapUser.objects.filter(xelMemberOf=self.object.dn),
+            'members': models.LdapUser.objects.filter(username__in=self.object.usernames),
         })
         return ctxt
 

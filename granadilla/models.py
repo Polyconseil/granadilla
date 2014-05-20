@@ -32,8 +32,8 @@ import unicodedata
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
-from ldapdb.models import Model
-from ldapdb.models.fields import CharField, ImageField, IntegerField, ListField
+from ldapdb import models as ldap_models
+from ldapdb.models import fields as ldap_fields
 
 BASE_DN = getattr(settings, "GRANADILLA_LDAP_BASE_DN")
 MAIL_DOMAIN = getattr(settings, "GRANADILLA_LDAP_MAIL_DOMAIN")
@@ -55,7 +55,7 @@ def normalise(str):
     nkfd_form = unicodedata.normalize('NFKD', unicode(str))
     return u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
-class LdapAcl(Model):
+class LdapAcl(ldap_models.Model):
     """
     Class for representing an LDAP ACL entry.
     """
@@ -64,8 +64,8 @@ class LdapAcl(Model):
     object_classes = ['groupOfNames']
 
     # groupOfNames
-    name = CharField(_('name'), db_column='cn', primary_key=True)
-    members = ListField(_('members'), db_column='member')
+    name = ldap_fields.CharField(_("name"), db_column='cn', primary_key=True)
+    members = ldap_fields.ListField(_("members"), db_column='member')
 
     def save(self):
         if not self.members:
@@ -78,10 +78,10 @@ class LdapAcl(Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = _('access control list')
-        verbose_name_plural = _('access control lists')
+        verbose_name = _("access control list")
+        verbose_name_plural = _("access control lists")
 
-class LdapGroup(Model):
+class LdapGroup(ldap_models.Model):
     """
     Class for representing an LDAP group entry.
     """
@@ -90,9 +90,9 @@ class LdapGroup(Model):
     object_classes = ['posixGroup']
 
     # posixGroup
-    gid = IntegerField(_('identifier'), db_column='gidNumber', unique=True)
-    name = CharField(_('name'), db_column='cn', primary_key=True)
-    usernames = ListField(_('usernames'), db_column='memberUid')
+    gid = ldap_fields.IntegerField(_("identifier"), db_column='gidNumber', unique=True)
+    name = ldap_fields.CharField(_("name"), db_column='cn', primary_key=True)
+    usernames = ldap_fields.ListField(_("usernames"), db_column='memberUid')
 
     def __str__(self):
         return self.name
@@ -102,10 +102,10 @@ class LdapGroup(Model):
 
     class Meta:
         ordering = ('name',)
-        verbose_name = _('group')
-        verbose_name_plural = _('groups')
+        verbose_name = _("group")
+        verbose_name_plural = _("groups")
 
-class LdapContact(Model):
+class LdapContact(ldap_models.Model):
     """
     Class for representing an LDAP contact entry.
     """
@@ -113,15 +113,15 @@ class LdapContact(Model):
     object_classes = ['inetOrgPerson']
 
     # inetOrgPerson
-    first_name = CharField(_('first name'), db_column='givenName')
-    last_name = CharField(_('last name'), db_column='sn')
-    full_name = CharField(_('full name'), db_column='cn', primary_key=True)
-    organization = CharField(_('organization'), db_column='o', blank=True)
-    email = CharField(_('e-mail address'), db_column='mail', blank=True)
-    phone = CharField(_('phone'), db_column='telephoneNumber', blank=True)
-    mobile_phone = CharField(_('mobile phone'), db_column='mobile', blank=True)
-    photo = ImageField(_('photo'), db_column='jpegPhoto')
-    postal_address = CharField(_('postal address'), db_column='postalAddress', blank=True)
+    first_name = ldap_fields.CharField(_("first name"), db_column='givenName')
+    last_name = ldap_fields.CharField(_("last name"), db_column='sn')
+    full_name = ldap_fields.CharField(_("full name"), db_column='cn', primary_key=True)
+    organization = ldap_fields.CharField(_("organization"), db_column='o', blank=True)
+    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', blank=True)
+    phone = ldap_fields.CharField(_("phone"), db_column='telephoneNumber', blank=True)
+    mobile_phone = ldap_fields.CharField(_("mobile phone"), db_column='mobile', blank=True)
+    photo = ldap_fields.ImageField(_("photo"), db_column='jpegPhoto')
+    postal_address = ldap_fields.CharField(_("postal address"), db_column='postalAddress', blank=True)
 
     def __unicode__(self):
         return self.full_name
@@ -139,23 +139,23 @@ class LdapContact(Model):
     class Meta:
         abstract = True
         ordering = ('last_name', 'first_name')
-        verbose_name = _('contact')
-        verbose_name_plural = _('contacts')
+        verbose_name = _("contact")
+        verbose_name_plural = _("contacts")
 
 
-class LdapServer(Model):
+class LdapServer(ldap_models.Model):
     """Class for a Server."""
     # LDAP meta-data
     base_dn = SERVERS_DN
     object_classes = ['ipHost']
 
-    name = CharField(_('name'), db_column='cn')
-    ip_address = CharField(_('IP address'), db_column='ipHostNumber')
-    description = CharField(_('description'), db_column='description')
+    name = ldap_fields.CharField(_("name"), db_column='cn')
+    ip_address = ldap_fields.CharField(_("IP address"), db_column='ipHostNumber')
+    description = ldap_fields.CharField(_("description"), db_column='description')
 
     class Meta:
-        verbose_name = _('server')
-        verbose_name_plural = _('servers')
+        verbose_name = _("server")
+        verbose_name_plural = _("servers")
 
     def __str__(self):
         return self.name
@@ -164,7 +164,7 @@ class LdapServer(Model):
         return self.name
 
 
-class LdapUser(Model):
+class LdapUser(ldap_models.Model):
     """
     Class for representing an LDAP user entry.
 
@@ -183,32 +183,32 @@ class LdapUser(Model):
         object_classes.append('sambaSamAccount')
 
     # inetOrgPerson
-    first_name = CharField(_('first name'), db_column='givenName')
-    last_name = CharField(_('last name'), db_column='sn')
-    full_name = CharField(_('full name'), db_column='cn')
-    email = CharField(_('e-mail address'), db_column='mail', blank=True)
-    phone = CharField(_('phone'), db_column='telephoneNumber', blank=True)
-    mobile_phone = CharField(_('mobile phone'), db_column='mobile', blank=True)
-    photo = ImageField(_('photo'), db_column='jpegPhoto')
+    first_name = ldap_fields.CharField(_("first name"), db_column='givenName')
+    last_name = ldap_fields.CharField(_("last name"), db_column='sn')
+    full_name = ldap_fields.CharField(_("full name"), db_column='cn')
+    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', blank=True)
+    phone = ldap_fields.CharField(_("phone"), db_column='telephoneNumber', blank=True)
+    mobile_phone = ldap_fields.CharField(_("mobile phone"), db_column='mobile', blank=True)
+    photo = ldap_fields.ImageField(_("photo"), db_column='jpegPhoto')
 
     # FIXME: this is a hack
-    internal_phone = CharField(_('internal phone'), db_column='roomNumber', blank=True)
+    internal_phone = ldap_fields.CharField(_("internal phone"), db_column='roomNumber', blank=True)
 
     # posixAccount
-    uid = IntegerField(_('user id'), db_column='uidNumber', unique=True)
-    group = IntegerField(_('group id'), db_column='gidNumber')
-    gecos =  CharField(db_column='gecos')
-    home_directory = CharField(_('home directory'), db_column='homeDirectory')
-    login_shell = CharField(_('login shell'), db_column='loginShell', default=USERS_SHELL)
-    username = CharField(_('username'), db_column='uid', primary_key=True)
-    password = CharField(_('password'), db_column='userPassword')
+    uid = ldap_fields.IntegerField(_("user id"), db_column='uidNumber', unique=True)
+    group = ldap_fields.IntegerField(_("group id"), db_column='gidNumber')
+    gecos =  ldap_fields.CharField(db_column='gecos')
+    home_directory = ldap_fields.CharField(_("home directory"), db_column='homeDirectory')
+    login_shell = ldap_fields.CharField(_("login shell"), db_column='loginShell', default=USERS_SHELL)
+    username = ldap_fields.CharField(_("username"), db_column='uid', primary_key=True)
+    password = ldap_fields.CharField(_("password"), db_column='userPassword')
 
     # samba
     if USERS_SAMBA:
-        samba_sid = CharField(db_column='sambaSID')
-        samba_lmpassword = CharField(db_column='sambaLMPassword')
-        samba_ntpassword = CharField(db_column='sambaNTPassword')
-        samba_pwdlastset = IntegerField(db_column='sambaPwdLastSet')
+        samba_sid = ldap_fields.CharField(db_column='sambaSID')
+        samba_lmpassword = ldap_fields.CharField(db_column='sambaLMPassword')
+        samba_ntpassword = ldap_fields.CharField(db_column='sambaNTPassword')
+        samba_pwdlastset = ldap_fields.IntegerField(db_column='sambaPwdLastSet')
 
     def defaults(self, key):
         if key == "email":
@@ -255,10 +255,10 @@ class LdapUser(Model):
         
     class Meta:
         ordering = ('last_name', 'first_name')
-        verbose_name = _('user')
-        verbose_name_plural = _('users')
+        verbose_name = _("user")
+        verbose_name_plural = _("users")
 
-class LdapOrganizationalUnit(Model):
+class LdapOrganizationalUnit(ldap_models.Model):
     """
     Class for representing an LDAP organization unit entry.
     """
@@ -267,7 +267,7 @@ class LdapOrganizationalUnit(Model):
     object_classes = ['organizationalUnit']
 
     # organizationalUnit
-    name = CharField(_('name'), db_column='ou', primary_key=True)
+    name = ldap_fields.CharField(_("name"), db_column='ou', primary_key=True)
 
 if __name__ == "__main__":
     import doctest
