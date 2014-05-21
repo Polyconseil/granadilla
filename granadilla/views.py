@@ -20,7 +20,7 @@
 
 import time
 
-from django.conf import settings
+from .conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
@@ -47,7 +47,7 @@ def can_write(user, entry):
     return can_edit
 
 def get_contacts(user):
-    base_dn = "ou=%s,%s" % (user.username, models.CONTACTS_DN)
+    base_dn = "ou=%s,%s,%s" % (user.username, settings.GRANADILLA_LDAP_CONTACTS_OU, settings.GRANADILLA_LDAP_BASE_DN)
     return models.LdapContact.scoped(base_dn)
 
 def vcard(user):
@@ -101,7 +101,7 @@ class ContactCreate(generic_views.CreateView):
     form_class = LdapContactForm
 
     def get_form_kwargs(self):
-        base_dn = 'ou=%s,%s' % (self.request.user.username, models.CONTACTS_DN)
+        base_dn = 'ou=%s,%s,%s' % (self.request.user.username, settings.GRANADILLA_LDAP_CONTACTS_OU, settings.GRANADILLA_LDAP_BASE_DN)
         kwargs = super(ContactCreate, self).get_form_kwargs()
         kwargs['base_dn'] = base_dn
         return kwargs

@@ -19,12 +19,14 @@
 #
 
 from django.contrib import admin
+
+from .conf import settings
 from . import models
 
 class LdapAclAdmin(admin.ModelAdmin):
     exclude = ['dn', 'members']
 
-if models.ACLS_DN:
+if settings.GRANADILLA_LDAP_ACLS_OU:
     admin.site.register(models.LdapAcl, LdapAclAdmin)
 
 

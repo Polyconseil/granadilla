@@ -111,17 +111,21 @@ LDAPDB_SERVER_URI = config.get('ldap.server', 'ldaps://ldaps.example.org')
 # Base DN for LDAP database.
 GRANADILLA_LDAP_BASE_DN = config.get('granadilla.base_dn', 'dc=example,dc=org')
 
+# The organizationalUnit for groups
+GRANADILLA_LDAP_GROUPS_OU = config.get('granadilla.groups_ou', 'ou=groups')
+# The organizationalUnit for users
+GRANADILLA_LDAP_USERS_OU = config.get('granadilla.users_ou', 'ou=users')
+# The organizationalUnit for servers
+GRANADILLA_LDAP_SERVERS_OU = config.get('granadilla.servers_ou', 'ou=servers')
+# The organizationalUnit for contacts
+GRANADILLA_LDAP_CONTACTS_OU = config.get('granadilla.contacts_ou', 'ou=contacts')
+# The organizationalUnit for acls
+GRANADILLA_LDAP_ACLS_OU = config.get('granadilla.acls_ou', 'ou=acls')
+
 # Domain to automatically generate e-mail addresses for new users.
 GRANADILLA_LDAP_MAIL_DOMAIN = config.get('granadilla.mail_domain', 'example.org')
-
 # The "base" group which is displayed in the index view.
 GRANADILLA_LDAP_USERS_GROUP = config.get('granadilla.users_group', 'test')
-
-# The base DN for groups
-GRANADILLA_LDAP_GROUPS_DN = config.get('granadilla.groups_dn', 'ou=groups,dc=example,dc=org')
-
-# The base DN for users
-GRANADILLA_LDAP_USERS_DN = config.get('granadilla.users_dn', 'ou=users,dc=example,dc=org')
 
 # URL from which Granadilla's static media are served.
 GRANADILLA_MEDIA_PREFIX = STATIC_URL
