@@ -3,4 +3,3 @@ django-appconf
 django-ldapdb
 
 getconf
-vobject

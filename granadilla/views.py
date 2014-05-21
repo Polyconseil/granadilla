@@ -34,6 +34,7 @@ from django.views import generic as generic_views
 from granadilla.templatetags.granadilla_tags import granadilla_media
 from granadilla.forms import LdapContactForm, LdapUserForm
 from . import models
+from . import vcard
 
 def can_write(user, entry):
     """
@@ -50,36 +51,25 @@ def get_contacts(user):
     base_dn = "ou=%s,%s,%s" % (user.username, settings.GRANADILLA_LDAP_CONTACTS_OU, settings.GRANADILLA_LDAP_BASE_DN)
     return models.LdapContact.scoped(base_dn)
 
-def vcard(user):
+def user_vcard(user):
     """Return the vCard for a contact."""
-    import vobject
-    card = vobject.vCard()
-    card.add('n')
-    card.n.value = vobject.vcard.Name(given=user.first_name, family=user.last_name)
-    card.add('fn')
-    card.fn.value = user.full_name
-    card.add('email')
-    card.email.value = user.email
-    card.email.type_param = 'INTERNET'
-    if hasattr(user, 'organization') and user.organization:
-        org = card.add('org')
-        org.value = [user.organization]
-    if user.phone:
-        tel = card.add('tel')
-        tel.value = user.phone
-        tel.type_param = "VOICE"
-    if user.mobile_phone:
-        tel = card.add('tel')
-        tel.value = user.mobile_phone
-        tel.type_param = "CELL"
-    if False and user.photo:
-        photo = card.add('photo')
-        photo.value = user.photo
-        photo.encoding_param = "b"
-        photo.type_param = "JPEG"
+    card = vcard.VCard()
+    card['kind'] = 'individual'
+    card['names'] = [
+        [user.first_name],
+        [user.last_name],
+        [],  # Additional names
+        [],  # Honorific prefixes
+        [],  # Honorific suffixes
+    ]
+    card['full_name'] = user.full_name
+    card['email'] = user.email
+    card['org'] = getattr(user, 'organization', '')
+    card['phone'] = user.phone
+    card['cell'] = user.mobile_phone
 
     # send response
-    response = HttpResponse(card.serialize(), "text/x-vcard; charset=utf-8")
+    response = HttpResponse(card.render_bytes(), "text/x-vcard; charset=utf-8")
     response['Content-Disposition'] = "attachment; filename=%s.vcf" % user.pk.replace(' ', '')
     return response
     
@@ -91,7 +81,7 @@ def index(request, template_name='granadilla/facebook.html'):
 @login_required
 def contact_card(request, contact_id):
     contact = get_contacts(request.user).objects.get(pk=contact_id)
-    return vcard(contact)
+    return user_vcard(contact)
 
 
 class ContactCreate(generic_views.CreateView):
@@ -249,5 +239,5 @@ def user(request, uid):
 @login_required
 def user_card(request, uid):
     user = get_object_or_404(models.LdapUser, pk=uid)
-    return vcard(user)
+    return user_vcard(user)
  
