@@ -18,17 +18,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import unicode_literals
+
 import inspect
 import logging
 import os
 import os.path
+import termios
 import sys
 
-from django.db.models.signals import post_save, post_delete
+from .conf import settings
+from . import models
 
-from granadilla.models import LdapAcl, LdapGroup, LdapUser, LdapOrganizationalUnit, ACLS_DN, MAIL_DOMAIN, USERS_DN, USERS_GROUP, USERS_MAILMAP, USERS_SAMBA, GROUPS_DN, GROUPS_MAILMAP
-
-POSTMAP = "/usr/sbin/postmap"
+PY2 = sys.version_info[0] == 2
 
 # configure logging
 logger = logging.getLogger()
@@ -37,236 +39,281 @@ handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'
 logger.addHandler(handler)
 logger.setLevel(logging.DEBUG)
 
-def change_password(user):
-    password1 = grab("Password: ", True)
-    password2 = grab("Password (again): ", True)
-    if password2 != password1:
-        raise Exception("Passwords do not match")
-    user.set_password(password1)
 
-def grab(prompt, password=False):
-    import sys
-    import termios
+def command(fun):
+    """Decorator that marks a method as "publicly callable".
 
-    if password:
-        fd = sys.stdin.fileno()
-        old = termios.tcgetattr(fd)
-        new = termios.tcgetattr(fd)
-        new[3] = new[3] & ~termios.ECHO
-        try:
-            termios.tcsetattr(fd, termios.TCSADRAIN, new)
-            passwd = raw_input(prompt)
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old)
-        sys.stdout.write("\n")
-        return passwd
-    else:
-        sys.stdout.write(prompt)
-        return unicode(sys.stdin.readline(), 'utf-8').strip()
+    Usage:
 
-def prompt(object, *fields):
-    for key in fields:
-        field = object._meta.get_field(key)
-        name = key.replace("_", " ").title()
-        default = getattr(object, key)
-        new_value = ''
+        >>> @command
+        ... def foo(self):
+        ...     pass
+    """
+    fun.is_command = True
+    return fun
 
-        if default:
-            new_value = grab("%s [%s]: " % (name, default))
-        else:
-            while not len(new_value):
-                new_value = grab("%s: " % (name))
-
-        if new_value:
-            setattr(object, key, new_value)
 
 class Tool(object):
-    def __init__(self):
-        """
-        Setup callbacks for user/groups modifications.
-        """
-        post_delete.connect(self.postfix_groups, sender=LdapGroup)
-        post_save.connect(self.postfix_groups, sender=LdapGroup)
-        post_delete.connect(self.postfix_users, sender=LdapUser)
-        post_save.connect(self.postfix_users, sender=LdapUser)
 
+    def _write(self, txt, *args):
+        txt = txt % args
+        txt += '\n'
+        if PY2:
+            sys.stdout.write(txt.encode('utf-8'))
+        else:
+            sys.stdout.write(txt)
+
+    def _error(self, txt, *args):
+        txt = txt % args
+        txt += '\n'
+        if PY2:
+            sys.stderr.write(txt.encode('utf-8'))
+        else:
+            sys.stderr.write(txt)
+
+    def change_password(self, user):
+        password1 = self.grab("Password: ", True)
+        password2 = self.grab("Password (again): ", True)
+        if password2 != password1:
+            raise Exception("Passwords do not match")
+        user.set_password(password1)
+
+    def grab(self, prompt, password=False):
+
+        if password:
+            fd = sys.stdin.fileno()
+            old = termios.tcgetattr(fd)
+            new = termios.tcgetattr(fd)
+            new[3] = new[3] & ~termios.ECHO
+            try:
+                termios.tcsetattr(fd, termios.TCSADRAIN, new)
+                passwd = raw_input(prompt)
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            sys.stdout.write("\n")
+            return passwd
+        else:
+            sys.stdout.write(prompt)
+            return unicode(sys.stdin.readline(), 'utf-8').strip()
+
+    def fill_object(self, obj, *fields):
+        for key in fields:
+            field = obj._meta.get_field(key)
+            name = key.replace("_", " ").title()
+            default = getattr(obj, key)
+            new_value = ''
+
+            if default:
+                new_value = self.grab("%s [%s]: " % (name, default))
+            else:
+                while not len(new_value):
+                    new_value = self.grab("%s: " % (name))
+
+            if new_value:
+                setattr(obj, key, new_value)
+
+    @command
     def addgroup(self, groupname):
         """
         Create a new group.
         """
         # get gid
-        groups = LdapGroup.objects.all()
-        if groups:
-            id = max([ x.gid for x in groups ]) + 1
+        gids = models.LdapGroup.objects.values_list('gid', flat=True)
+        if gids:
+            gid = max(gids) + 1
         else:
-            id = 10000
-        
+            gid = 10000
+
         # create group
-        group = LdapGroup()
+        group = models.LdapGroup()
         group.name = groupname
-        group.gid = id
+        group.gid = gid
         group.save()
 
-    def adduser(self, username, groupname=None):
+    @command
+    def adduser(self, username):
         """
-        Create a new user or add a user to a group.
+        Create a new user.
         """
-        # add a user to a group
-        if groupname:
-            user = LdapUser.objects.get(username=username)
-            group = LdapGroup.objects.get(name=groupname)
-            if not user.username in group.usernames:
-                group.usernames.append(user.username)
-                group.save()
-
-            if ACLS_DN:
-                try:
-                    acl = LdapAcl.objects.get(name=groupname)
-                    if not user.dn in acl.members:
-                        acl.members.append(user.dn)
-                        acl.save()
-                except LdapAcl.DoesNotExist:
-                    acl = LdapAcl()
-                    acl.name = groupname
-                    acl.members = [ user.dn ]
-                    acl.save()
-            return
- 
         # create user
-        users = LdapUser.objects.all()
+        users = models.LdapUser.objects.all()
         if users:
             id = max([ x.uid for x in users ]) + 1
         else:
             id = 10000
 
         # prompt for information
-        user = LdapUser()
+        user = models.LdapUser()
         user.username = username
         user.uid = id
-        prompt(user, 'first_name', 'last_name')
+        self.fill_object(user, 'first_name', 'last_name')
         for key in ['full_name', 'gecos', 'group', 'email', 'home_directory', 'login_shell']:
             setattr(user, key, user.defaults(key))
-        prompt(user, 'email')
+        self.fill_object(user, 'email')
         change_password(user)
 
         # save user
         user.save()
 
+    @command
+    def addusergroup(self, username, groupname):
+        """Add user <username> to group <groupname>."""
+        user = models.LdapUser.objects.get(username=username)
+        group = models.LdapGroup.objects.get(name=groupname)
+        if not user.username in group.usernames:
+            group.usernames.append(user.username)
+            group.save()
+
+        if settings.GRANADILLA_ACLS_DN:
+            try:
+                acl = models.LdapAcl.objects.get(name=groupname)
+                if not user.dn in acl.members:
+                    acl.members.append(user.dn)
+                    acl.save()
+            except models.LdapAcl.DoesNotExist:
+                acl = models.LdapAcl()
+                acl.name = groupname
+                acl.members = [ user.dn ]
+                acl.save()
+
+    @command
     def catgroup(self, groupname):
         """
         Display a group's details.
         """
-        user = LdapGroup.objects.get(name=groupname)
-        print "dn: %s" % user.dn
-        for field in user._meta.fields:
+        group = models.LdapGroup.objects.get(name=groupname)
+        self._write("dn: %s", group.dn)
+        for field in group._meta.fields:
             if field.db_column:
-                val = getattr(user, field.name, None)
+                val = getattr(group, field.name, None)
                 if val:
-                    print "%s: %s" % (field.db_column, getattr(user, field.name))
+                    self._write("%s: %s", field.db_column, val)
 
+    @command
     def catuser(self, username):
         """
         Display a user's details.
         """
-        user = LdapUser.objects.get(username=username)
-        print "dn: %s" % user.dn
+        user = models.LdapUser.objects.get(username=username)
+        self._write("dn: %s", user.dn)
         for field in user._meta.fields:
             if field.db_column and field.db_column != "jpegPhoto":
                 val = getattr(user, field.name, None)
                 if val:
-                    print "%s: %s" % (field.db_column, getattr(user, field.name))
+                    self._write("%s: %s", field.db_column, val)
 
+    @command
     def delgroup(self, groupname):
         """
         Delete the given group.
         """
-        LdapGroup.objects.get(name=groupname).delete()
-        if ACLS_DN:
+        group = models.LdapGroup.objects.get(name=groupname)
+        self._write("Deleting group %s", gorup.dn)
+        group.delete()
+        if settings.GRANADILLA_ACLS_DN:
             try:
-                LdapAcl.objects.get(name=groupname).delete()
-            except LdapAcl.DoesNotExist:
+                models.LdapAcl.objects.get(name=groupname).delete()
+            except models.LdapAcl.DoesNotExist:
                 pass
 
-    def deluser(self, username, groupname=None):
+    @command
+    def delusergroup(self, username, groupname):
+        """Remove a user from a group."""
+        user = models.LdapUser.objects.get(username=username)
+        group = models.LdapGroup.objects.get(name=groupname)
+
+        self._delusergroup(user, group)
+
+    def _delusergroup(self, user, group):
+        if user.username in group.usernames:
+            self._write("Removing %s from group %s", user.username, group.name)
+            group.usernames = [ x for x in group.usernames if x != user.username ]
+            group.save()
+
+        if settings.GRANADILLA_ACLS_DN:
+            try:
+                acl = models.LdapAcl.objects.get(name=group.name)
+                if user.dn in acl.members:
+                    acl.members = [ x for x in acl.members if x != user.dn ]
+                    acl.save()
+            except models.LdapAcl.DoesNotExist:
+                pass
+
+
+    @command
+    def deluser(self, username):
         """
-        Delete the given user or remove it from a group.
+        Delete the given user.
         """
-	def remove_from_group(user, group):
-            if user.username in group.usernames:
-                group.usernames = [ x for x in group.usernames if x != user.username ]
-                group.save()
-
-            if ACLS_DN:
-                try:
-                    acl = LdapAcl.objects.get(name=group.name)
-                    if user.dn in acl.members:
-                        acl.members = [ x for x in acl.members if x != user.dn ]
-                        acl.save()
-                except LdapAcl.DoesNotExist:
-                    pass
-
-        user = LdapUser.objects.get(username=username)
-
-        # remove user from a group
-        if groupname:
-            remove_from_group(user, LdapGroup.objects.get(name=groupname))
-            return
+        user = models.LdapUser.objects.get(username=username)
 
         # delete user
-        for group in LdapGroup.objects.all():
-            remove_from_group(user, group)
+        for group in models.LdapGroup.objects.all():
+            self._delusergroup(user, group)
+
+        self._write("Removing user %s", user.dn)
         user.delete()
 
+    @command
     def init(self):
         """
         Initialise the LDAP directory.
         """
         # create organizational units
-        for dn in [ USERS_DN, GROUPS_DN, ACLS_DN ]:
+        for dn in [ settings.GRANADILLA_USERS_DN, settings.GRANADILLA_GROUPS_DN, settings.GRANADILLA_ACLS_DN ]:
             if not dn:
                 continue
 
             # FIXME: this may not be accurate depending on the DN
             name = dn.split(",")[0].split("=")[1]
             try:
-                ou = LdapOrganizationalUnit.objects.get(name=name)
-            except LdapOrganizationalUnit.DoesNotExist:
-                ou = LdapOrganizationalUnit()
+                ou = models.LdapOrganizationalUnit.objects.get(name=name)
+            except models.LdapOrganizationalUnit.DoesNotExist:
+                ou = models.LdapOrganizationalUnit()
                 ou.name = name
                 ou.save()
 
         # create default group
         try:
-            LdapGroup.objects.get(name=USERS_GROUP)
+            models.LdapGroup.objects.get(name=settings.GRANADILLA_USERS_GROUP)
         except:
-            self.addgroup(USERS_GROUP)
+            self.addgroup(settings.GRANADILLA_USERS_GROUP)
 
-    def lsgroup(self, groupname=None):
-        """
-        Print the list of groups.
-        """
-        if groupname:
-            members = LdapGroup.objects.get(name=groupname).usernames
-            others = [ x.username for x in LdapUser.objects.all() if not x.username in members ]
-            print "members:\n " +  "\n ".join(sorted(members))
-            print
-            print "non-members:\n " +  "\n ".join(sorted(others))
-        else:
-            for group in LdapGroup.objects.all():
-                print group.name
+    @command
+    def lsgroups(self):
+        """Print the list of groups"""
+        for group in models.LdapGroup.objects.all():
+            self._write(group.name)
 
+    @command
+    def lsgroup(self, groupname):
+        """
+        Print the members of one group
+        """
+        members = models.LdapGroup.objects.get(name=groupname).usernames
+        others = [ x.username for x in models.LdapUser.objects.all() if not x.username in members ]
+        self._write("members:")
+        for member in sorted(members):
+            self._write("  %s", member)
+        self._write("")
+        self._write("non-members:")
+        for other in sorted(others):
+            self._write("  %s", other)
+
+    @command
     def lsuser(self):
         """
         Print the list of users.
         """
-        for user in LdapUser.objects.order_by('username'):
-            print user.username
+        for user in models.LdapUser.objects.order_by('username'):
+            self._write(user.username)
 
+    @command
     def moduser(self, username, attr, value):
         """
         Modify an attribute for a user.
         """
-        user = LdapUser.objects.get(username=username)
+        user = models.LdapUser.objects.get(username=username)
         for field in user._meta.fields:
             if field.db_column == attr:
                 setattr(user, field.name, value)
@@ -274,87 +321,66 @@ class Tool(object):
                 return
         raise Exception("Unnown field %s" % attr)
 
+    @command
+    def passwd(self, username):
+        """
+        Change the given user's password.
+        """
+        user = models.LdapUser.objects.get(username=username)
+        change_password(user)
+        user.save()
+
+    @command
     def help(self):
         """
         Display a help message.
         """
         cmdhelp = []
         for cmd in dir(self):
-            if not cmd.startswith("_"):
-                func = getattr(tool, cmd)
-                bits = [cmd]
-                bits.extend(["<%s>" % arg for arg in inspect.getargspec(func)[0][1:] ])
-                cmdhelp.append("%s%s" % (" ".join(bits).ljust(30), func.__doc__.strip()))
+            func = getattr(self, cmd)
+            if not getattr(func, 'is_command', False):
+                continue
 
-        print """Usage: %s <command> [arguments..]
+            bits = [cmd]
+            bits.extend(["<%s>" % arg for arg in inspect.getargspec(func)[0][1:] ])
+            cmdhelp.append("%s%s" % (" ".join(bits).ljust(50), func.__doc__.strip()))
+
+        self._write("""Usage: %s <command> [arguments..]
 
 Commands:
 %s
-""" % (os.path.basename(sys.argv[0]), "\n".join(cmdhelp))
+""", os.path.basename(sys.argv[0]), "\n".join(cmdhelp))
 
-    def passwd(self, username):
-        """
-        Change the given user's password.
-        """
-        user = LdapUser.objects.get(username=username)
-        change_password(user)
-        user.save()
 
-    def postfix_groups(self, **kwargs):
-        """
-        Print the postfix virtual domain map for the LDAP groups.
-        """
-        if not GROUPS_MAILMAP:
-            return
+    def main(self, argv):
+        if len(argv) < 2:  # No command
+            self.help()
+            return 1
 
-        logging.info("Writing postfix groups map to %s" % GROUPS_MAILMAP)
-        fp = open(GROUPS_MAILMAP, "w")
-        for group in LdapGroup.objects.filter():
-            if len(group.usernames):
-                dest = " ".join(group.usernames)
-            else:
-                dest = "/dev/null"
-            fp.write("%s@%s\t%s\n" % (group.name, MAIL_DOMAIN, dest))
-        fp.close()
-        os.system("%s %s" % (POSTMAP, GROUPS_MAILMAP))
- 
-    def postfix_users(self, **kwargs):
-        """
-        Print the postfix virtual domain map for the LDAP users.
-        """
-        if not USERS_MAILMAP:
-            return
+        cmd = argv[1]
+        args = argv[2:]
+        meth = getattr(self, cmd, None)
+        if meth is None or not getattr(meth, 'is_command', False):
+            self._error("Unknown command %s", cmd)
+            self.help()
+            return 1
 
-        logging.info("Writing postfix users map to %s" % USERS_MAILMAP)
-        fp = open(USERS_MAILMAP, "w")
-        for user in LdapUser.objects.all():
-            if user.email:
-                fp.write("%s\t%s\n" % (user.email, user.username))
-        fp.close()
-        os.system("%s %s" % (POSTMAP, USERS_MAILMAP))
+        try:
+            meth(*args)
+        except models.LdapUser.DoesNotExist:
+            self._error("The requested user does not exist.")
+            return 2
+        except models.LdapGroup.DoesNotExist:
+            self._error("The requested group does not exist.")
+            return 2
+
+
+def launch_tool():
+    """Main 'tool' entry point."""
+    tool = Tool()
+    retcode = tool.main(sys.argv)
+    sys.exit(retcode)
+
 
 if __name__ == "__main__":
-    import sys
-    tool = Tool()
-
-    if len(sys.argv) < 2:
-        tool.help()
-        sys.exit(1)
-
-    cmd = sys.argv[1]
-    args = sys.argv[2:]
-    try:
-        func = getattr(tool, cmd)
-    except AttributeError:
-        tool.help()
-        sys.exit(1)
-
-    try:
-        func(*args)
-    except LdapUser.DoesNotExist:
-        sys.stderr.write("The requested user does not exist.\n")
-        sys.exit(1)
-    except LdapGroup.DoesNotExist:
-        sys.stderr.write("The requested group does not exist.\n")
-        sys.exit(1)
-
+    launch_tool()
