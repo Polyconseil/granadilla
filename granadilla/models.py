@@ -47,7 +47,7 @@ class LdapAcl(ldap_models.Model):
     Class for representing an LDAP ACL entry.
     """
     # LDAP meta-data
-    base_dn = '%s,%s' % (settings.GRANADILLA_LDAP_ACLS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+    base_dn = settings.GRANADILLA_ACLS_DN
     object_classes = ['groupOfNames']
 
     # groupOfNames
@@ -73,7 +73,7 @@ class LdapGroup(ldap_models.Model):
     Class for representing an LDAP group entry.
     """
     # LDAP meta-data
-    base_dn = '%s,%s' % (settings.GRANADILLA_LDAP_GROUPS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+    base_dn = settings.GRANADILLA_GROUPS_DN
     object_classes = ['posixGroup']
 
     # posixGroup
@@ -133,7 +133,7 @@ class LdapContact(ldap_models.Model):
 class LdapServer(ldap_models.Model):
     """Class for a Server."""
     # LDAP meta-data
-    base_dn = '%s,%s' % (settings.GRANADILLA_LDAP_SERVERS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+    base_dn = settings.GRANADILLA_SERVERS_DN
     object_classes = ['ipHost']
 
     name = ldap_fields.CharField(_("name"), db_column='cn')
@@ -164,9 +164,9 @@ class LdapUser(ldap_models.Model):
     '(|(uid=foo)(uid=bar))'
     """
     # LDAP meta-data
-    base_dn = '%s,%s' % (settings.GRANADILLA_LDAP_USERS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+    base_dn = settings.GRANADILLA_USERS_DN
     object_classes = ['posixAccount', 'shadowAccount', 'inetOrgPerson']
-    if settings.GRANADILLA_LDAP_USE_SAMBA:
+    if settings.GRANADILLA_USE_SAMBA:
         object_classes.append('sambaSamAccount')
 
     # inetOrgPerson
@@ -186,12 +186,12 @@ class LdapUser(ldap_models.Model):
     group = ldap_fields.IntegerField(_("group id"), db_column='gidNumber')
     gecos =  ldap_fields.CharField(db_column='gecos')
     home_directory = ldap_fields.CharField(_("home directory"), db_column='homeDirectory')
-    login_shell = ldap_fields.CharField(_("login shell"), db_column='loginShell', default=settings.GRANADILLA_LDAP_USERS_SHELL)
+    login_shell = ldap_fields.CharField(_("login shell"), db_column='loginShell', default=settings.GRANADILLA_USERS_SHELL)
     username = ldap_fields.CharField(_("username"), db_column='uid', primary_key=True)
     password = ldap_fields.CharField(_("password"), db_column='userPassword')
 
     # samba
-    if settings.GRANADILLA_LDAP_USE_SAMBA:
+    if settings.GRANADILLA_USE_SAMBA:
         samba_sid = ldap_fields.CharField(db_column='sambaSID')
         samba_lmpassword = ldap_fields.CharField(db_column='sambaLMPassword')
         samba_ntpassword = ldap_fields.CharField(db_column='sambaNTPassword')
@@ -203,19 +203,19 @@ class LdapUser(ldap_models.Model):
             email += "."
             email += "-".join(normalise(self.last_name).split(" "))
             email += "@"
-            email += settings.GRANADILLA_LDAP_MAIL_DOMAIN
+            email += settings.GRANADILLA_MAIL_DOMAIN
             return email.lower()
         elif key == "full_name":
             return " ".join([self.first_name, self.last_name])
         elif key == "gecos":
             return normalise(self.full_name)
         elif key == "group":
-            group = LdapGroup.objects.get(name=settings.GRANADILLA_LDAP_USERS_GROUP)
+            group = LdapGroup.objects.get(name=settings.GRANADILLA_USERS_GROUP)
             return group.gid
         elif key == "home_directory":
-            return os.path.join(settings.GRANADILLA_LDAP_USERS_HOME, self.username)
+            return os.path.join(settings.GRANADILLA_USERS_HOME, self.username)
         elif key == "login_shell":
-            return settings.GRANADILLA_LDAP_USERS_SHELL
+            return settings.GRANADILLA_USERS_SHELL
         raise Exception("No defaults for %s" % key)
 
     def __str__(self):
@@ -229,15 +229,15 @@ class LdapUser(ldap_models.Model):
         m.update(password)
         hashed = "{MD5}" + base64.b64encode(m.digest())
         self.password = hashed
-        if settings.GRANADILLA_LDAP_USE_SAMBA:
+        if settings.GRANADILLA_USE_SAMBA:
             import smbpasswd
             self.samba_ntpassword = smbpasswd.nthash(password)
             self.samba_lmpassword = smbpasswd.lmhash(password)
             self.samba_pwdlastset = int(time.time())
 
     def save(self):
-        if settings.GRANADILLA_LDAP_USE_SAMBA and not self.samba_sid:
-            self.samba_sid = "%s-%i" % (settings.GRANADILLA_LDAP_SAMBA_PREFIX, self.uid * 2 + 1000)
+        if settings.GRANADILLA_USE_SAMBA and not self.samba_sid:
+            self.samba_sid = "%s-%i" % (settings.GRANADILLA_SAMBA_PREFIX, self.uid * 2 + 1000)
         super(LdapUser, self).save()
         
     class Meta:
@@ -250,7 +250,7 @@ class LdapOrganizationalUnit(ldap_models.Model):
     Class for representing an LDAP organization unit entry.
     """
     # LDAP meta-data
-    base_dn = settings.GRANADILLA_LDAP_BASE_DN
+    base_dn = settings.GRANADILLA_BASE_DN
     object_classes = ['organizationalUnit']
 
     # organizationalUnit

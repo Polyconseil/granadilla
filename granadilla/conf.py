@@ -31,18 +31,18 @@ class GranadillaConf(appconf.AppConf):
     """
 
     class Meta:
-        prefix = 'granadilla_ldap'
+        prefix = 'granadilla'
         required = ['base_dn']
 
     # LDAP root
     BASE_DN = 'dc=example,dc=org'
 
     # Specific organizationalUnit for some components
-    ACLS_OU = 'ou=groupacls'
-    CONTACTS_OU = 'ou=contacts'
-    GROUPS_OU = 'ou=groups'
-    SERVERS_OU = 'ou=servers'
-    USERS_OU = 'ou=users'
+    ACLS_DN = 'ou=groupacls,dc=example,dc=org'
+    CONTACTS_DN = 'ou=contacts,dc=example,dc=org'
+    GROUPS_DN = 'ou=groups,dc=example,dc=org'
+    SERVERS_DN = 'ou=servers,dc=example,dc=org'
+    USERS_DN = 'ou=users,dc=example,dc=org'
 
     # Homepage: "full company" group name
     USERS_GROUP = 'all'

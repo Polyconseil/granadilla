@@ -26,7 +26,7 @@ from . import models
 class LdapAclAdmin(admin.ModelAdmin):
     exclude = ['dn', 'members']
 
-if settings.GRANADILLA_LDAP_ACLS_OU:
+if settings.GRANADILLA_ACLS_DN:
     admin.site.register(models.LdapAcl, LdapAclAdmin)
 
 

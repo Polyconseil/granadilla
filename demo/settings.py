@@ -109,23 +109,28 @@ LDAPDB_BIND_PASSWORD = config.get('ldap.bind_pw')
 LDAPDB_SERVER_URI = config.get('ldap.server', 'ldaps://ldaps.example.org')
 
 # Base DN for LDAP database.
-GRANADILLA_LDAP_BASE_DN = config.get('granadilla.base_dn', 'dc=example,dc=org')
+GRANADILLA_BASE_DN = config.get('granadilla.base_dn', 'dc=example,dc=org')
 
 # The organizationalUnit for groups
-GRANADILLA_LDAP_GROUPS_OU = config.get('granadilla.groups_ou', 'ou=groups')
+GRANADILLA_GROUPS_OU = config.get('granadilla.groups_ou', 'ou=groups')
+GRANADILLA_GROUPS_DN = '%s,%s' % (GRANADILLA_GROUPS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for users
-GRANADILLA_LDAP_USERS_OU = config.get('granadilla.users_ou', 'ou=users')
+GRANADILLA_USERS_OU = config.get('granadilla.users_ou', 'ou=users')
+GRANADILLA_USERS_DN = '%s,%s' % (GRANADILLA_USERS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for servers
-GRANADILLA_LDAP_SERVERS_OU = config.get('granadilla.servers_ou', 'ou=servers')
+GRANADILLA_SERVERS_OU = config.get('granadilla.servers_ou', 'ou=servers')
+GRANADILLA_SERVERS_DN = '%s,%s' % (GRANADILLA_SERVERS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for contacts
-GRANADILLA_LDAP_CONTACTS_OU = config.get('granadilla.contacts_ou', 'ou=contacts')
+GRANADILLA_CONTACTS_OU = config.get('granadilla.contacts_ou', 'ou=contacts')
+GRANADILLA_CONTACTS_DN = '%s,%s' % (GRANADILLA_CONTACTS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for acls
-GRANADILLA_LDAP_ACLS_OU = config.get('granadilla.acls_ou', 'ou=acls')
+GRANADILLA_ACLS_OU = config.get('granadilla.acls_ou', 'ou=acls')
+GRANADILLA_ACLS_DN = '%s,%s' % (GRANADILLA_ACLS_OU, GRANADILLA_BASE_DN)
 
 # Domain to automatically generate e-mail addresses for new users.
-GRANADILLA_LDAP_MAIL_DOMAIN = config.get('granadilla.mail_domain', 'example.org')
+GRANADILLA_MAIL_DOMAIN = config.get('granadilla.mail_domain', 'example.org')
 # The "base" group which is displayed in the index view.
-GRANADILLA_LDAP_USERS_GROUP = config.get('granadilla.users_group', 'test')
+GRANADILLA_USERS_GROUP = config.get('granadilla.users_group', 'test')
 
 # URL from which Granadilla's static media are served.
 GRANADILLA_MEDIA_PREFIX = STATIC_URL

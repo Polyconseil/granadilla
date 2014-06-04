@@ -48,7 +48,7 @@ def can_write(user, entry):
     return can_edit
 
 def get_contacts(user):
-    base_dn = "ou=%s,%s,%s" % (user.username, settings.GRANADILLA_LDAP_CONTACTS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+    base_dn = "ou=%s,%s" % (user.username, settings.GRANADILLA_CONTACTS_DN)
     return models.LdapContact.scoped(base_dn)
 
 def user_vcard(user):
@@ -75,7 +75,7 @@ def user_vcard(user):
     
 @login_required
 def index(request, template_name='granadilla/facebook.html'):
-    return group(request, pk=settings.GRANADILLA_LDAP_USERS_GROUP)
+    return group(request, pk=settings.GRANADILLA_USERS_GROUP)
 
 
 @login_required
@@ -91,7 +91,7 @@ class ContactCreate(generic_views.CreateView):
     form_class = LdapContactForm
 
     def get_form_kwargs(self):
-        base_dn = 'ou=%s,%s,%s' % (self.request.user.username, settings.GRANADILLA_LDAP_CONTACTS_OU, settings.GRANADILLA_LDAP_BASE_DN)
+        base_dn = 'ou=%s,%s' % (self.request.user.username, settings.GRANADILLA_CONTACTS_DN)
         kwargs = super(ContactCreate, self).get_form_kwargs()
         kwargs['base_dn'] = base_dn
         return kwargs
@@ -148,7 +148,7 @@ class GroupView(generic_views.DetailView):
         ctxt = super(GroupView, self).get_context_data(**kwargs)
         ctxt.update({
             'printable': self.printable,
-            'home': self.object.name == settings.GRANADILLA_LDAP_USERS_GROUP,
+            'home': self.object.name == settings.GRANADILLA_USERS_GROUP,
             'group': self.object,
             'members': models.LdapUser.objects.filter(username__in=self.object.usernames),
         })
