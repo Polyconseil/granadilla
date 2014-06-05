@@ -2,4 +2,9 @@ Django>=1.6
 django-appconf
 django-ldapdb
 
+# For cli colors
+colorama
+# For password strength
+zxcvbn
+
 getconf

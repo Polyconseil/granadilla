@@ -20,12 +20,15 @@
 
 from __future__ import unicode_literals
 
+import colorama
 import inspect
 import logging
 import os
 import os.path
 import termios
 import sys
+
+import zxcvbn
 
 from .conf import settings
 from . import models
@@ -55,28 +58,56 @@ def command(fun):
 
 class CLI(object):
 
-    def _write(self, txt, *args):
-        txt = txt % args
-        txt += '\n'
-        if PY2:
-            sys.stdout.write(txt.encode('utf-8'))
-        else:
-            sys.stdout.write(txt)
+    PASSWORD_MIN_SCORE = 3
 
-    def _error(self, txt, *args):
+    def _write(self, txt, args, color=colorama.Fore.RESET, target=sys.stdout):
         txt = txt % args
-        txt += '\n'
+        txt = '%s%s%s\n' % (color, txt, colorama.Fore.RESET)
         if PY2:
-            sys.stderr.write(txt.encode('utf-8'))
+            target.write(txt.encode('utf-8'))
         else:
-            sys.stderr.write(txt)
+            target.write(txt)
+
+    def display(self, txt, *args):
+        self._write(txt, args)
+
+    def success(self, txt, *args):
+        self._write(txt, *args, color=colorama.Fore.GREEN)
+
+    def warn(self, txt, *args):
+        self._write(txt, *args, color=colorama.Fore.YELLOW)
+
+    def error(self, txt, *args):
+        self._write(txt, *args, color=colorama.Fore.RED, target=sys.stderr)
 
     def change_password(self, user):
+        password = None
+
+        while password is None:
+            password = self._get_good_password(user)
+
+        raise Exception("Debug!!")
+        user.set_password(password)
+
+    def _get_good_password(self, user):
         password1 = self.grab("Password: ", True)
         password2 = self.grab("Password (again): ", True)
         if password2 != password1:
-            raise Exception("Passwords do not match")
-        user.set_password(password1)
+            self.error("Passwords do not match, try again.")
+            return None
+
+        blacklist = [
+            user.username,
+            user.first_name,
+            user.last_name,
+        ]
+        check = zxcvbn.password_strength(password1, blacklist)
+        if check['score'] < self.PASSWORD_MIN_SCORE:
+            self.error("Password is too weak (bruteforce: %s)", check['crack_time_display'])
+            return None
+
+        self.success("Password is strong enough (bruteforce: %s)", check['crack_time_display'])
+        return password1
 
     def grab(self, prompt, password=False):
 
@@ -150,7 +181,7 @@ class CLI(object):
         for key in ['full_name', 'gecos', 'group', 'email', 'home_directory', 'login_shell']:
             setattr(user, key, user.defaults(key))
         self.fill_object(user, 'email')
-        change_password(user)
+        self.change_password(user)
 
         # save user
         user.save()
@@ -182,12 +213,12 @@ class CLI(object):
         Display a group's details.
         """
         group = models.LdapGroup.objects.get(name=groupname)
-        self._write("dn: %s", group.dn)
+        self.display("dn: %s", group.dn)
         for field in group._meta.fields:
             if field.db_column:
                 val = getattr(group, field.name, None)
                 if val:
-                    self._write("%s: %s", field.db_column, val)
+                    self.display("%s: %s", field.db_column, val)
 
     @command
     def catuser(self, username):
@@ -195,12 +226,12 @@ class CLI(object):
         Display a user's details.
         """
         user = models.LdapUser.objects.get(username=username)
-        self._write("dn: %s", user.dn)
+        self.display("dn: %s", user.dn)
         for field in user._meta.fields:
             if field.db_column and field.db_column != "jpegPhoto":
                 val = getattr(user, field.name, None)
                 if val:
-                    self._write("%s: %s", field.db_column, val)
+                    self.display("%s: %s", field.db_column, val)
 
     @command
     def delgroup(self, groupname):
@@ -208,7 +239,7 @@ class CLI(object):
         Delete the given group.
         """
         group = models.LdapGroup.objects.get(name=groupname)
-        self._write("Deleting group %s", gorup.dn)
+        self.warn("Deleting group %s", gorup.dn)
         group.delete()
         if settings.GRANADILLA_USE_ACLS:
             try:
@@ -226,7 +257,7 @@ class CLI(object):
 
     def _delusergroup(self, user, group):
         if user.username in group.usernames:
-            self._write("Removing %s from group %s", user.username, group.name)
+            self.warn("Removing %s from group %s", user.username, group.name)
             group.usernames = [ x for x in group.usernames if x != user.username ]
             group.save()
 
@@ -251,7 +282,7 @@ class CLI(object):
         for group in models.LdapGroup.objects.all():
             self._delusergroup(user, group)
 
-        self._write("Removing user %s", user.dn)
+        self.warn("Removing user %s", user.dn)
         user.delete()
 
     @command
@@ -287,7 +318,7 @@ class CLI(object):
     def lsgroups(self):
         """Print the list of groups"""
         for group in models.LdapGroup.objects.all():
-            self._write(group.name)
+            self.display(group.name)
 
     @command
     def lsgroup(self, groupname):
@@ -296,13 +327,13 @@ class CLI(object):
         """
         members = models.LdapGroup.objects.get(name=groupname).usernames
         others = [ x.username for x in models.LdapUser.objects.all() if not x.username in members ]
-        self._write("members:")
+        self.display("members:")
         for member in sorted(members):
-            self._write("  %s", member)
-        self._write("")
-        self._write("non-members:")
+            self.display("  %s", member)
+        self.display("")
+        self.display("non-members:")
         for other in sorted(others):
-            self._write("  %s", other)
+            self.display("  %s", other)
 
     @command
     def lsuser(self):
@@ -310,17 +341,17 @@ class CLI(object):
         Print the list of users.
         """
         for user in models.LdapUser.objects.order_by('username'):
-            self._write(user.username)
+            self.display(user.username)
 
     @command
     def lsusergroups(self, username):
         """Print the groups a user belongs to."""
         user = models.LdapUser.objects.get(username=username)
-        self._write("Groups for %s (%s):\n", user.username, user.email)
+        self.display("Groups for %s (%s):\n", user.username, user.email)
 
         for group in models.LdapGroup.objects.order_by('name'):
             if user.username in group.usernames:
-                self._write(group.name)
+                self.display(group.name)
 
     @command
     def moduser(self, username, attr, value):
@@ -341,7 +372,7 @@ class CLI(object):
         Change the given user's password.
         """
         user = models.LdapUser.objects.get(username=username)
-        change_password(user)
+        self.change_password(user)
         user.save()
 
     @command
@@ -359,7 +390,7 @@ class CLI(object):
             bits.extend(["<%s>" % arg for arg in inspect.getargspec(func)[0][1:] ])
             cmdhelp.append("%s%s" % (" ".join(bits).ljust(50), func.__doc__.strip()))
 
-        self._write("""Usage: %s <command> [arguments..]
+        self.display("""Usage: %s <command> [arguments..]
 
 Commands:
 %s
@@ -375,17 +406,17 @@ Commands:
         args = argv[2:]
         meth = getattr(self, cmd, None)
         if meth is None or not getattr(meth, 'is_command', False):
-            self._error("Unknown command %s", cmd)
+            self.error("Unknown command %s", cmd)
             self.help()
             return 1
 
         try:
             meth(*args)
         except models.LdapUser.DoesNotExist:
-            self._error("The requested user does not exist.")
+            self.error("The requested user does not exist.")
             return 2
         except models.LdapGroup.DoesNotExist:
-            self._error("The requested group does not exist.")
+            self.error("The requested group does not exist.")
             return 2
 
 
