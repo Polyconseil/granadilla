@@ -104,8 +104,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # LDAP
-LDAPDB_BIND_DN = config.get('ldap.bind_dn', 'uid=test,dc=example,dc=org')
-LDAPDB_BIND_PASSWORD = config.get('ldap.bind_pw')
+LDAPDB_BIND_DN = config.get('ldap.webapp_bind_dn', 'uid=test,dc=example,dc=org')
+LDAPDB_BIND_PASSWORD = config.get('ldap.webapp_bind_pw')
 LDAPDB_SERVER_URI = config.get('ldap.server', 'ldaps://ldaps.example.org')
 
 # Base DN for LDAP database.
