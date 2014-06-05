@@ -1,6 +1,6 @@
 # Local, password-full
 local_settings.ini
-demo/db.sqlite3
+granadilla_webapp/db.sqlite3
 
 # Temporary files
 .*.swp
@@ -9,7 +9,7 @@ demo/db.sqlite3
 __pycache__/
 
 # Build-related files
-demo/static
+granadilla_webapp/static
 docs/_build/
 .coverage
 .tox

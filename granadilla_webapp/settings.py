@@ -1,5 +1,5 @@
 """
-Django settings for demo project.
+Django settings for granadilla_webapp project.
 
 For more information on this file, see
 https://docs.djangoproject.com/en/1.6/topics/settings/
@@ -44,7 +44,7 @@ ALLOWED_HOSTS = config.getlist('django.allowed_hosts')
 
 INSTALLED_APPS = (
     'granadilla',
-    'demo.web',
+    'granadilla_webapp.web',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -63,9 +63,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'demo.urls'
+ROOT_URLCONF = 'granadilla_webapp.urls'
 
-WSGI_APPLICATION = 'demo.wsgi.application'
+WSGI_APPLICATION = 'granadilla_webapp.wsgi.application'
 
 
 # Database
