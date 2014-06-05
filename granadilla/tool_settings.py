@@ -125,6 +125,7 @@ GRANADILLA_CONTACTS_DN = '%s,%s' % (GRANADILLA_CONTACTS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for acls
 GRANADILLA_ACLS_OU = config.get('granadilla.acls_ou', 'ou=acls')
 GRANADILLA_ACLS_DN = '%s,%s' % (GRANADILLA_ACLS_OU, GRANADILLA_BASE_DN)
+GRANADILLA_USE_ACLS = config.getbool('granadilla.use_acls', False)
 
 # Domain to automatically generate e-mail addresses for new users.
 GRANADILLA_MAIL_DOMAIN = config.get('granadilla.mail_domain', 'example.org')

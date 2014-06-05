@@ -164,7 +164,7 @@ class Tool(object):
             group.usernames.append(user.username)
             group.save()
 
-        if settings.GRANADILLA_ACLS_DN:
+        if settings.GRANADILLA_USE_ACLS:
             try:
                 acl = models.LdapAcl.objects.get(name=groupname)
                 if not user.dn in acl.members:
@@ -210,7 +210,7 @@ class Tool(object):
         group = models.LdapGroup.objects.get(name=groupname)
         self._write("Deleting group %s", gorup.dn)
         group.delete()
-        if settings.GRANADILLA_ACLS_DN:
+        if settings.GRANADILLA_USE_ACLS:
             try:
                 models.LdapAcl.objects.get(name=groupname).delete()
             except models.LdapAcl.DoesNotExist:
@@ -230,7 +230,7 @@ class Tool(object):
             group.usernames = [ x for x in group.usernames if x != user.username ]
             group.save()
 
-        if settings.GRANADILLA_ACLS_DN:
+        if settings.GRANADILLA_USE_ACLS:
             try:
                 acl = models.LdapAcl.objects.get(name=group.name)
                 if user.dn in acl.members:
@@ -260,10 +260,14 @@ class Tool(object):
         Initialise the LDAP directory.
         """
         # create organizational units
-        for dn in [ settings.GRANADILLA_USERS_DN, settings.GRANADILLA_GROUPS_DN, settings.GRANADILLA_ACLS_DN ]:
-            if not dn:
-                continue
+        dns = [
+            settings.GRANADILLA_USERS_DN,
+            settings.GRANADILLA_GROUPS_DN,
+        ]
+        if settings.GRANADILLA_USE_ACLS:
+            dns += [settings.GRANADILLA_ACLS_DN]
 
+        for dn in dns:
             # FIXME: this may not be accurate depending on the DN
             name = dn.split(",")[0].split("=")[1]
             try:
