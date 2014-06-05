@@ -53,7 +53,7 @@ def command(fun):
     return fun
 
 
-class Tool(object):
+class CLI(object):
 
     def _write(self, txt, *args):
         txt = txt % args
@@ -379,12 +379,12 @@ Commands:
             return 2
 
 
-def launch_tool():
-    """Main 'tool' entry point."""
-    tool = Tool()
-    retcode = tool.main(sys.argv)
+def launch_cli():
+    """Main 'cli' entry point."""
+    cli = CLI()
+    retcode = cli.main(sys.argv)
     sys.exit(retcode)
 
 
 if __name__ == "__main__":
-    launch_tool()
+    launch_cli()
