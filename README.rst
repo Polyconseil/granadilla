@@ -16,6 +16,7 @@ or integrated in a larger website; the required settings are listed in ``granadi
 
 The command-line tool is designed for standalone use, and reads its settings from the ``/etc/granadilla/settings.ini`` file.
 
+The valid configuration values are described in the ``example_settings.ini`` file.
 
 
 License
