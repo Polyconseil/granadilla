@@ -313,6 +313,16 @@ class CLI(object):
             self._write(user.username)
 
     @command
+    def lsusergroups(self, username):
+        """Print the groups a user belongs to."""
+        user = models.LdapUser.objects.get(username=username)
+        self._write("Groups for %s (%s):\n", user.username, user.email)
+
+        for group in models.LdapGroup.objects.order_by('name'):
+            if user.username in group.usernames:
+                self._write(group.name)
+
+    @command
     def moduser(self, username, attr, value):
         """
         Modify an attribute for a user.
