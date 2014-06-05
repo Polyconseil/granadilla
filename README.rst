@@ -15,8 +15,10 @@ The webapp can run either in a standalone mode (with the ``granadilla_webapp.set
 or integrated in a larger website; the required settings are listed in ``granadilla/conf.py``.
 
 The command-line tool is designed for standalone use, and reads its settings from the ``/etc/granadilla/settings.ini`` file.
+This file is also used by the webapp if launched in standalone mode, with ``DJANGO_SETTINGS_MODULE=granadilla_webapp.settings``.
 
 The valid configuration values are described in the ``example_settings.ini`` file.
+
 
 
 License
