@@ -130,8 +130,17 @@ GRANADILLA_USE_ACLS = config.getbool('granadilla.use_acls', False)
 
 # Domain to automatically generate e-mail addresses for new users.
 GRANADILLA_MAIL_DOMAIN = config.get('granadilla.mail_domain', 'example.org')
+# The home folder for user accounts
+GRANADILLA_USERS_HOME = config.get('granadilla.users_home', '/home')
 # The "base" group which is displayed in the index view.
 GRANADILLA_USERS_GROUP = config.get('granadilla.users_group', 'test')
+# The 'admin' groups
+GRANADILLA_ADMIN_GROUPS = config.getlist('granadilla.admin_groups')
+
+# Whether to use samba
+GRANADILLA_USE_SAMBA = config.getbool('granadilla.use_samba', False)
+# Samba SID prefix
+GRANADILLA_SAMBA_PREFIX = config.get('granadilla.samba_prefix', 'S-1-0-0')
 
 # URL from which Granadilla's static media are served.
 GRANADILLA_MEDIA_PREFIX = STATIC_URL

@@ -48,6 +48,9 @@ class GranadillaConf(appconf.AppConf):
     # Homepage: "full company" group name
     USERS_GROUP = 'all'
 
+    # Admin: list of admin group names
+    ADMIN_GROUPS = []
+
     # Account settings
     USERS_HOME = '/home'
     USERS_SHELL = '/bin/bash'

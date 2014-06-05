@@ -43,8 +43,7 @@ def can_write(user, entry):
     can_edit = user.username == entry.username or user.is_superuser
     for group in user.groups.all():
         if group.name in settings.GRANADILLA_ADMIN_GROUPS:
-            can_edit = True
-            break
+            return True
     return can_edit
 
 def get_contacts(user):
