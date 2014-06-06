@@ -86,7 +86,6 @@ class CLI(object):
         while password is None:
             password = self._get_good_password(user)
 
-        raise Exception("Debug!!")
         user.set_password(password)
 
     def _get_good_password(self, user):
