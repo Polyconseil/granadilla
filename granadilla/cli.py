@@ -72,13 +72,13 @@ class CLI(object):
         self._write(txt, args)
 
     def success(self, txt, *args):
-        self._write(txt, *args, color=colorama.Fore.GREEN)
+        self._write(txt, args, color=colorama.Fore.GREEN)
 
     def warn(self, txt, *args):
-        self._write(txt, *args, color=colorama.Fore.YELLOW)
+        self._write(txt, args, color=colorama.Fore.YELLOW)
 
     def error(self, txt, *args):
-        self._write(txt, *args, color=colorama.Fore.RED, target=sys.stderr)
+        self._write(txt, args, color=colorama.Fore.RED, target=sys.stderr)
 
     def change_password(self, user):
         password = None
