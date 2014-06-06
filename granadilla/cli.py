@@ -239,7 +239,7 @@ class CLI(object):
         Delete the given group.
         """
         group = models.LdapGroup.objects.get(name=groupname)
-        self.warn("Deleting group %s", gorup.dn)
+        self.warn("Deleting group %s", group.dn)
         group.delete()
         if settings.GRANADILLA_USE_ACLS:
             try:
