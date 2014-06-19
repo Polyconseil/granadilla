@@ -20,6 +20,7 @@
 
 from __future__ import unicode_literals
 
+import datetime, time
 import colorama
 import inspect
 import logging
@@ -30,6 +31,7 @@ import sys
 
 import zxcvbn
 
+from base64 import b64decode, b16encode
 from .conf import settings
 from . import models
 
@@ -339,8 +341,30 @@ class CLI(object):
         """
         Print the list of users.
         """
+        print '{0: <20}{1: <50}{2: <20}'.format('Username', 'Email', 'Password last set')
         for user in models.LdapUser.objects.order_by('username'):
-            self.display(user.username)
+            if user.samba_pwdlastset > time.time() - 3 * 365 * 24 * 60 * 60:
+                pwd_last_set = datetime.date.fromtimestamp(user.samba_pwdlastset).strftime('%d %b %Y')
+            else:
+                pwd_last_set = "long ago"
+            print '{0: <20}{1: <50}{2: <20}'.format(user.username, user.email, pwd_last_set)
+
+    @command
+    def lspasswd(self):
+        """
+        Print the list of passwords.
+        """
+        for user in models.LdapUser.objects.order_by('username'):
+            print user.password
+
+    @command
+    def lsjohnpasswd(self):
+        """
+        Print the list of password formated for john
+        """
+        for user in models.LdapUser.objects.order_by('username'):
+            thispwd = b16encode(b64decode(user.password.split('}')[1])).lower()
+            print '{0}:{1}'.format(user.username,thispwd)
 
     @command
     def lsusergroups(self, username):
