@@ -20,12 +20,16 @@
 
 from __future__ import unicode_literals
 
+import base64
 import colorama
+import datetime
 import inspect
 import logging
 import os
 import os.path
 import termios
+import time
+import re
 import sys
 
 import zxcvbn
@@ -348,8 +352,36 @@ class CLI(object):
         """
         Print the list of users.
         """
+        self.display("%20d%50d%20d", "username", "Email", "Password last set")
         for user in models.LdapUser.objects.order_by('username'):
-            self.display(user.username)
+            if user.samba_pwdlastset > time.time() - 3 * 365 * 24 * 60 * 60:
+                pwd_last_set = datetime.date.fromtimestamp(user.samba_pwdlastset).strftime('%d %b %Y')
+            else:
+                pwd_last_set = "long ago"
+            self.display("%20d%50d%20d", user.username, user.email, pwd_last_set)
+
+    @command
+    def lspasswd(self):
+        """
+        Print the list of passwords.
+        """
+        for user in models.LdapUser.objects.order_by('username'):
+            self.display(user.password)
+
+    @command
+    def lsjohnpasswd(self):
+        """
+        Print the list of password formated for john
+        """
+        password_re = re.compile(r'^{\w+}([A-Za-z0-9/+=]+)$')  # {MD5}uihGYUGE==
+        for user in models.LdapUser.objects.order_by('username'):
+            match = password_re.match(user.password)
+            if not match:
+                self.warn("Password of user %s doesn't match {<ALGO>}<hash> format.", user.username)
+                continue
+            password = match.groups()[0]
+            john_password = base64.b16encode(base64.b64decode(password)).lower()
+            self.display("%s:%s", user.username, john_password)
 
     @command
     def lsusergroups(self, username):
