@@ -35,6 +35,13 @@ from . import models
 
 PY2 = sys.version_info[0] == 2
 
+if PY2:
+    def force_text(txt):
+        return txt.decode('utf-8')
+else:
+    def force_text(txt):
+        return txt
+
 # configure logging
 logger = logging.getLogger()
 handler = logging.StreamHandler()
@@ -117,14 +124,15 @@ class CLI(object):
             new[3] = new[3] & ~termios.ECHO
             try:
                 termios.tcsetattr(fd, termios.TCSADRAIN, new)
-                passwd = raw_input(prompt)
+                passwd = force_text(raw_input(prompt))
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old)
             sys.stdout.write("\n")
             return passwd
+
         else:
             sys.stdout.write(prompt)
-            return unicode(sys.stdin.readline(), 'utf-8').strip()
+            return force_text(sys.readline()).strip()
 
     def fill_object(self, obj, *fields):
         for key in fields:
