@@ -132,7 +132,7 @@ class CLI(object):
 
         else:
             sys.stdout.write(prompt)
-            return force_text(sys.readline()).strip()
+            return force_text(sys.stdin.readline()).strip()
 
     def fill_object(self, obj, *fields):
         for key in fields:
