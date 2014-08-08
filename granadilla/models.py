@@ -42,6 +42,12 @@ def normalise(str):
     return u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
+def hash_password(password):
+    m = md5_constructor()
+    m.update(password)
+    return "{MD5}" + base64.b64encode(m.digest())
+
+
 class LdapAcl(ldap_models.Model):
     """
     Class for representing an LDAP ACL entry.
@@ -152,6 +158,9 @@ class LdapServiceAccount(ldap_models.Model):
     def __unicode__(self):
         return self.username
 
+    def set_password(self, password):
+        self.password = hash_password(password)
+
     def save(self, *args, **kwargs):
         self.sn = self.cn = self.username
         super(LdapServiceAccount, self).save(*args, **kwargs)
@@ -231,10 +240,7 @@ class LdapUser(ldap_models.Model):
         return self.full_name
 
     def set_password(self, password):
-        m = md5_constructor()
-        m.update(password)
-        hashed = "{MD5}" + base64.b64encode(m.digest())
-        self.password = hashed
+        self.password = hash_password(password)
         if settings.GRANADILLA_USE_SAMBA:
             import smbpasswd
             self.samba_ntpassword = smbpasswd.nthash(password)

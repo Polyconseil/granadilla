@@ -383,12 +383,55 @@ class CLI(object):
         user.save()
 
     @command
-    def lsservices(self):
+    def service_list(self):
         """
         Print the list of service accounts.
         """
         for account in models.LdapServiceAccount.objects.order_by('username'):
             self.display("%-20s %s", account.username, account.description.replace('\n', '  '))
+
+    @command
+    def service_add(self, username):
+        """
+        Add a new service account.
+        """
+        account = models.LdapServiceAccount()
+        account.username = username
+        self.fill_object(account, 'description')
+        self.change_password(account)
+
+        account.save()
+
+    @command
+    def service_mod(self, username, attr, value):
+        """
+        Modify an attribute for a service.
+        """
+        account = models.LdapServiceAccount.objects.get(username=username)
+        for field in account._meta.fields:
+            if field.db_column == attr:
+                setattr(account, field.name, value)
+                account.save()
+                return
+        raise Exception("Unknown field %s" % attr)
+
+    @command
+    def service_del(self, username):
+        """
+        Delete a service account.
+        """
+        account = models.LdapServiceAccount.objects.get(username=username)
+        self.warn("Deleting service %s", account.dn)
+        account.delete()
+
+    @command
+    def service_passwd(self, username):
+        """
+        Change the password of a service.
+        """
+        account = models.LdapServiceAccount.objects.get(username=username)
+        self.change_password(account)
+        account.save()
 
     @command
     def help(self):
