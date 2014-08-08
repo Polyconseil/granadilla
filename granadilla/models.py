@@ -142,7 +142,7 @@ class LdapServiceAccount(ldap_models.Model):
     base_dn = settings.GRANADILLA_SERVICES_DN
     object_classes = ['person', 'uidObject']
 
-    username = ldap_fields.CharField(_("username"), db_column='uid')
+    username = ldap_fields.CharField(_("username"), db_column='uid', primary_key=True)
     first_name = ldap_fields.CharField(_("name (copy)"), db_column='sn', editable=False)
     last_name = ldap_fields.CharField(_("name (copy)"), db_column='cn', editable=False)
     password = ldap_fields.CharField(_("password"), db_column='userPassword')
@@ -162,7 +162,7 @@ class LdapServiceAccount(ldap_models.Model):
         self.password = hash_password(password)
 
     def save(self, *args, **kwargs):
-        self.sn = self.cn = self.username
+        self.first_name = self.last_name = self.username
         super(LdapServiceAccount, self).save(*args, **kwargs)
 
 
