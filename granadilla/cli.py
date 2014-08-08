@@ -301,6 +301,7 @@ class CLI(object):
         dns = [
             settings.GRANADILLA_USERS_DN,
             settings.GRANADILLA_GROUPS_DN,
+            settings.GRANADILLA_SERVICES_DN,
         ]
         if settings.GRANADILLA_USE_ACLS:
             dns += [settings.GRANADILLA_ACLS_DN]
