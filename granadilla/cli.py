@@ -383,6 +383,14 @@ class CLI(object):
         user.save()
 
     @command
+    def lsservices(self):
+        """
+        Print the list of service accounts.
+        """
+        for account in models.LdapServiceAccount.objects.order_by('username'):
+            self.display("%-20s %s", account.username, account.description.replace('\n', '  '))
+
+    @command
     def help(self):
         """
         Display a help message.

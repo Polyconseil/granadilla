@@ -41,7 +41,7 @@ class GranadillaConf(appconf.AppConf):
     ACLS_DN = 'ou=groupacls,dc=example,dc=org'
     CONTACTS_DN = 'ou=contacts,dc=example,dc=org'
     GROUPS_DN = 'ou=groups,dc=example,dc=org'
-    SERVERS_DN = 'ou=servers,dc=example,dc=org'
+    SERVICES_DN = 'ou=services,dc=example,dc=org'
     USERS_DN = 'ou=users,dc=example,dc=org'
     USE_ACLS = False
 

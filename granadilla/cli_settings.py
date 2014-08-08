@@ -116,9 +116,9 @@ GRANADILLA_GROUPS_DN = '%s,%s' % (GRANADILLA_GROUPS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for users
 GRANADILLA_USERS_OU = config.get('granadilla.users_ou', 'ou=users')
 GRANADILLA_USERS_DN = '%s,%s' % (GRANADILLA_USERS_OU, GRANADILLA_BASE_DN)
-# The organizationalUnit for servers
-GRANADILLA_SERVERS_OU = config.get('granadilla.servers_ou', 'ou=servers')
-GRANADILLA_SERVERS_DN = '%s,%s' % (GRANADILLA_SERVERS_OU, GRANADILLA_BASE_DN)
+# The organizationalUnit for services
+GRANADILLA_SERVICES_OU = config.get('granadilla.services_ou', 'ou=services')
+GRANADILLA_SERVICES_DN = '%s,%s' % (GRANADILLA_SERVICES_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for contacts
 GRANADILLA_CONTACTS_OU = config.get('granadilla.contacts_ou', 'ou=contacts')
 GRANADILLA_CONTACTS_DN = '%s,%s' % (GRANADILLA_CONTACTS_OU, GRANADILLA_BASE_DN)

@@ -130,25 +130,31 @@ class LdapContact(ldap_models.Model):
         verbose_name_plural = _("contacts")
 
 
-class LdapServer(ldap_models.Model):
-    """Class for a Server."""
+class LdapServiceAccount(ldap_models.Model):
+    """Class for a Service account."""
     # LDAP meta-data
-    base_dn = settings.GRANADILLA_SERVERS_DN
-    object_classes = ['ipHost']
+    base_dn = settings.GRANADILLA_SERVICES_DN
+    object_classes = ['person', 'uidObject']
 
-    name = ldap_fields.CharField(_("name"), db_column='cn')
-    ip_address = ldap_fields.CharField(_("IP address"), db_column='ipHostNumber')
+    username = ldap_fields.CharField(_("username"), db_column='uid')
+    first_name = ldap_fields.CharField(_("name (copy)"), db_column='sn', editable=False)
+    last_name = ldap_fields.CharField(_("name (copy)"), db_column='cn', editable=False)
+    password = ldap_fields.CharField(_("password"), db_column='userPassword')
     description = ldap_fields.CharField(_("description"), db_column='description')
 
     class Meta:
-        verbose_name = _("server")
-        verbose_name_plural = _("servers")
+        verbose_name = _("service account")
+        verbose_name_plural = _("service accounts")
 
     def __str__(self):
-        return self.name
+        return self.username
 
     def __unicode__(self):
-        return self.name
+        return self.username
+
+    def save(self, *args, **kwargs):
+        self.sn = self.cn = self.username
+        super(LdapServiceAccount, self).save(*args, **kwargs)
 
 
 class LdapUser(ldap_models.Model):
