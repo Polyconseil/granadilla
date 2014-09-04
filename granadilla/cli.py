@@ -352,13 +352,13 @@ class CLI(object):
         """
         Print the list of users.
         """
-        self.display("%20d%50d%20d", "username", "Email", "Password last set")
+        self.display("%20s%50s%20s", "username", "Email", "Password last set")
         for user in models.LdapUser.objects.order_by('username'):
             if user.samba_pwdlastset > time.time() - 3 * 365 * 24 * 60 * 60:
                 pwd_last_set = datetime.date.fromtimestamp(user.samba_pwdlastset).strftime('%d %b %Y')
             else:
                 pwd_last_set = "long ago"
-            self.display("%20d%50d%20d", user.username, user.email, pwd_last_set)
+            self.display("%20s%50s%20s", user.username, user.email, pwd_last_set)
 
     @command
     def lspasswd(self):
