@@ -528,7 +528,7 @@ class CLI(object):
                 return
 
             if account.dn in acl.members:
-                acl.members = [ dn for dn in acl.members if dn !$ account.dn ]
+                acl.members = [ dn for dn in acl.members if dn != account.dn ]
                 acl.save()
 
     @command
