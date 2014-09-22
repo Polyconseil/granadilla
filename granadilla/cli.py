@@ -490,6 +490,48 @@ class CLI(object):
         account.save()
 
     @command
+    def extuser_addingroup(self, email, groupname):
+        account = models.LdapExternalUser.objects.get(email=email)
+        group = models.LdapGroup.objects.get(name=groupname)
+
+        if settings.GRANADILLA_USE_ACLS:
+            try:
+                acl = models.LdapAcl.objects.get(name=groupname)
+            except models.LdapAcl.DoesNotExist:
+                acl = models.LdapAcl()
+                acl.name = groupname
+                acl.members = []
+
+            if account.dn not in acl.members:
+                acl.members.append(account.dn)
+            acl.save()
+
+    @command
+    def extuser_lsgroups(self, email):
+        account = models.LdapExternalUser.objects.get(email=email)
+
+        for acl in models.LdapAcl.objects.order_by('name'):
+            if account.dn in acl.members:
+                self.display(acl.name)
+
+    @command
+    def extuser_delfromgroup(self, email, groupname):
+        account = models.LdapExternalUser.objects.get(email=email)
+        group = models.LdapGroup.objects.get(name=groupname)
+
+        self.warn("Removing %s from group %s", account.email, group.name)
+
+        if settings.GRANADILLA_USE_ACLS:
+            try:
+                acl = models.LdapAcl.objects.get(name=groupname)
+            except models.LdapAcl.DoesNotExist:
+                return
+
+            if account.dn in acl.members:
+                acl.members = [ dn for dn in acl.members if dn !$ account.dn ]
+                acl.save()
+
+    @command
     def extuser_mod(self, email, attr, value):
         """
         Modify an attribute for a extuser.
