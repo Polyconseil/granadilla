@@ -602,8 +602,14 @@ Commands:
         except models.LdapUser.DoesNotExist:
             self.error("The requested user does not exist.")
             return 2
-        except models.LdapGroup.DoesNotExist:
+        except (models.LdapAcl.DoesNotExist, models.LdapGroup.DoesNotExist):
             self.error("The requested group does not exist.")
+            return 2
+        except models.LdapServiceAccount.DoesNotExist:
+            self.error("The requested service account does not exist.")
+            return 2
+        except models.LdapExternalUser.DoesNotExist:
+            self.error("The requested external user does not exist.")
             return 2
 
 
