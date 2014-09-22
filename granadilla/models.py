@@ -284,7 +284,7 @@ class LdapExternalUser(ldap_models.Model):
     first_name = ldap_fields.CharField(_("first name"), db_column='givenName')
     last_name = ldap_fields.CharField(_("last name"), db_column='sn')
     full_name = ldap_fields.CharField(_("full name"), db_column='cn')
-    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', blank=True)
+    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', primary_key=True)
 
     def __str__(self):
         return self.username
