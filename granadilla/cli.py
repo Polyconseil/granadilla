@@ -304,6 +304,7 @@ class CLI(object):
         # create organizational units
         dns = [
             settings.GRANADILLA_USERS_DN,
+            settings.GRANADILLA_EXTERNAL_USERS_DN,
             settings.GRANADILLA_GROUPS_DN,
             settings.GRANADILLA_SERVICES_DN,
         ]
@@ -465,6 +466,50 @@ class CLI(object):
         account = models.LdapServiceAccount.objects.get(username=username)
         self.change_password(account)
         account.save()
+
+    @command
+    def extuser_list(self):
+        """
+        Print the list of extuser accounts.
+        """
+        for account in models.LdapExternalUser.objects.order_by('email'):
+            self.display("%-20s %s", account.username, account.full_name)
+
+    @command
+    def extuser_add(self, email):
+        """
+        Add a new extuser account.
+        """
+        account = models.LdapExternalUser()
+        account.email = email
+        self.fill_object(account, [
+            'first_name',
+            'last_name',
+        ])
+
+        account.save()
+
+    @command
+    def extuser_mod(self, email, attr, value):
+        """
+        Modify an attribute for a extuser.
+        """
+        account = models.LdapExternalUser.objects.get(email=email)
+        for field in account._meta.fields:
+            if field.db_column == attr:
+                setattr(account, field.name, value)
+                account.save()
+                return
+        raise Exception("Unknown field %s" % attr)
+
+    @command
+    def extuser_del(self, email):
+        """
+        Delete a extuser account.
+        """
+        account = models.LdapExternalUser.objects.get(email=email)
+        self.warn("Deleting extuser %s", account.dn)
+        account.delete()
 
     @command
     def help(self):

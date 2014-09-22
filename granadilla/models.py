@@ -271,6 +271,38 @@ class LdapOrganizationalUnit(ldap_models.Model):
     # organizationalUnit
     name = ldap_fields.CharField(_("name"), db_column='ou', primary_key=True)
 
+
+class LdapExternalUser(ldap_models.Model):
+    """
+    An external user.
+    """
+    # LDAP meta-data
+    base_dn = settings.GRANADILLA_EXTERNAL_USERS_DN
+    object_classes = ['inetOrgPerson']
+
+    # inetOrgPerson
+    first_name = ldap_fields.CharField(_("first name"), db_column='givenName')
+    last_name = ldap_fields.CharField(_("last name"), db_column='sn')
+    full_name = ldap_fields.CharField(_("full name"), db_column='cn')
+    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', blank=True)
+
+    def __str__(self):
+        return self.username
+
+    def __unicode__(self):
+        return self.full_name
+
+    class Meta:
+        ordering = ('last_name', 'first_name')
+        verbose_name = _("external user")
+        verbose_name_plural = _("external users")
+
+    def save(self, *args, **kwargs):
+        self.full_name = u"%s %s" % (self.first_name, self.last_name)
+        return super(LdapExternalUser, self).save(*args, **kwargs)
+
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
