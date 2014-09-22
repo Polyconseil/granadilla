@@ -473,7 +473,7 @@ class CLI(object):
         Print the list of extuser accounts.
         """
         for account in models.LdapExternalUser.objects.order_by('email'):
-            self.display("%-20s %s", account.username, account.full_name)
+            self.display("%-20s %s", account.email, account.full_name)
 
     @command
     def extuser_add(self, email):
