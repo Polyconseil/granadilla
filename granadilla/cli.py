@@ -138,7 +138,7 @@ class CLI(object):
             sys.stdout.write(prompt)
             return force_text(sys.stdin.readline()).strip()
 
-    def fill_object(self, obj, *fields):
+    def fill_object(self, obj, fields):
         for key in fields:
             field = obj._meta.get_field(key)
             name = key.replace("_", " ").title()
@@ -188,10 +188,10 @@ class CLI(object):
         user = models.LdapUser()
         user.username = username
         user.uid = id
-        self.fill_object(user, 'first_name', 'last_name')
+        self.fill_object(user, ['first_name', 'last_name'])
         for key in ['full_name', 'gecos', 'group', 'email', 'home_directory', 'login_shell']:
             setattr(user, key, user.defaults(key))
-        self.fill_object(user, 'email')
+        self.fill_object(user, ['email'])
         self.change_password(user)
 
         # save user
@@ -430,7 +430,7 @@ class CLI(object):
         """
         account = models.LdapServiceAccount()
         account.username = username
-        self.fill_object(account, 'description')
+        self.fill_object(account, ['description'])
         self.change_password(account)
 
         account.save()

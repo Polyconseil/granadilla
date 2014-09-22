@@ -74,6 +74,7 @@ class LdapAcl(ldap_models.Model):
         verbose_name = _("access control list")
         verbose_name_plural = _("access control lists")
 
+
 class LdapGroup(ldap_models.Model):
     """
     Class for representing an LDAP group entry.
@@ -97,6 +98,7 @@ class LdapGroup(ldap_models.Model):
         ordering = ('name',)
         verbose_name = _("group")
         verbose_name_plural = _("groups")
+
 
 class LdapContact(ldap_models.Model):
     """
@@ -256,6 +258,7 @@ class LdapUser(ldap_models.Model):
         ordering = ('last_name', 'first_name')
         verbose_name = _("user")
         verbose_name_plural = _("users")
+
 
 class LdapOrganizationalUnit(ldap_models.Model):
     """
