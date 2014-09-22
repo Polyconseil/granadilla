@@ -491,6 +491,9 @@ class CLI(object):
 
     @command
     def extuser_addingroup(self, email, groupname):
+        """
+        Add an extuser in a group.
+        """
         account = models.LdapExternalUser.objects.get(email=email)
         group = models.LdapGroup.objects.get(name=groupname)
 
@@ -508,6 +511,9 @@ class CLI(object):
 
     @command
     def extuser_lsgroups(self, email):
+        """
+        List the groups of an extuser.
+        """
         account = models.LdapExternalUser.objects.get(email=email)
 
         for acl in models.LdapAcl.objects.order_by('name'):
@@ -516,6 +522,9 @@ class CLI(object):
 
     @command
     def extuser_delfromgroup(self, email, groupname):
+        """
+        Remove an extuser from a group.
+        """
         account = models.LdapExternalUser.objects.get(email=email)
         group = models.LdapGroup.objects.get(name=groupname)
 
