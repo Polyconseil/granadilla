@@ -7,4 +7,4 @@ colorama
 # For password strength
 zxcvbn
 
-getconf
+getconf>=1.2.0

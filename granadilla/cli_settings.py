@@ -15,8 +15,10 @@ BASE_DIR = os.path.dirname(__file__)
 CHECKOUT_DIR = os.path.dirname(BASE_DIR)
 
 config = getconf.ConfigGetter('granadilla',
-    '/etc/granadilla/settings.ini',
-    os.path.join(CHECKOUT_DIR, 'local_settings.ini'),
+    [
+        '/etc/granadilla/settings.ini',
+        os.path.join(CHECKOUT_DIR, 'local_settings.ini'),
+    ],
 )
 
 # Quick-start development settings - unsuitable for production
