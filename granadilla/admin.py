@@ -57,9 +57,9 @@ class LdapUserAdmin(admin.ModelAdmin):
 admin.site.register(models.LdapUser, LdapUserAdmin)
 
 
-class LdapServerAdmin(admin.ModelAdmin):
+class LdapServiceAccountAdmin(admin.ModelAdmin):
     exclude = ['dn']
-    list_display = ['name', 'ip_address', 'description']
-    search_fields = ['name', 'description']
+    list_display = ['username', 'first_name', 'last_name', 'description']
+    search_fields = list_display
 
-admin.site.register(models.LdapServer, LdapServerAdmin)
+admin.site.register(models.LdapServiceAccount, LdapServiceAccountAdmin)
