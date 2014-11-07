@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 import base64
 import colorama
 import datetime
+import django
 import inspect
 import logging
 import os
@@ -33,6 +34,9 @@ import re
 import sys
 
 import zxcvbn
+
+if django.VERSION[:2] >= (1, 7):
+    django.setup()
 
 from .conf import settings
 from . import models
