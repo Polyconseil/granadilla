@@ -1,6 +1,7 @@
 Django>=1.6
 django-appconf
 django-ldapdb
+smbpasswd
 
 # For cli colors
 colorama
