@@ -44,7 +44,7 @@ def normalise(str):
 
 def hash_password(password):
     m = md5_constructor()
-    m.update(password)
+    m.update(password.encode('utf-8'))
     return "{MD5}" + base64.b64encode(m.digest())
 
 
