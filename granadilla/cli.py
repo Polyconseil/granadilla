@@ -98,23 +98,37 @@ class CLI(object):
     def change_password(self, user):
         password = None
 
+        blacklist = [
+            user.username,
+            user.first_name,
+            user.last_name,
+        ]
+
         while password is None:
-            password = self._get_good_password(user)
+            password = self._get_good_password(blacklist)
 
         user.set_password(password)
 
-    def _get_good_password(self, user):
+    def change_device_password(self, device):
+        password = None
+
+        blacklist = [
+            device.device_owner,
+            device.device_name,
+        ]
+
+        while password is None:
+            password = self._get_good_password(blacklist)
+
+        device.set_password(password)
+
+    def _get_good_password(self, blacklist):
         password1 = self.grab("Password: ", True)
         password2 = self.grab("Password (again): ", True)
         if password2 != password1:
             self.error("Passwords do not match, try again.")
             return None
 
-        blacklist = [
-            user.username,
-            user.first_name,
-            user.last_name,
-        ]
         check = zxcvbn.password_strength(password1, blacklist)
         if check['score'] < self.PASSWORD_MIN_SCORE:
             self.error("Password is too weak (bruteforce: %s)", check['crack_time_display'])
@@ -309,6 +323,7 @@ class CLI(object):
         dns = [
             settings.GRANADILLA_USERS_DN,
             settings.GRANADILLA_EXTERNAL_USERS_DN,
+            settings.GRANADILLA_DEVICES_DN,
             settings.GRANADILLA_GROUPS_DN,
             settings.GRANADILLA_SERVICES_DN,
         ]
@@ -565,6 +580,47 @@ class CLI(object):
         account = models.LdapExternalUser.objects.get(email=email)
         self.warn("Deleting extuser %s", account.dn)
         account.delete()
+
+    @command
+    def device_list(self):
+        """
+        Print the list of devices and their owner.
+        """
+        for device in models.LdapDevice.objects.order_by('device_fullname'):
+            self.display("%s", device.device_fullname)
+
+    @command
+    def device_add(self, username):
+        """
+        Add a new device.
+        """
+        device = models.LdapDevice()
+        user = models.LdapUser.objects.get(username=username)
+        device.device_owner = user.dn
+        device.device_name = self.grab("Device name: ", False) 
+        device.device_fullname = user.username + "_" + device.device_name
+        self.change_device_password(device)
+        device.save()
+
+    @command
+    def device_password(self, username, device_name):
+        """
+        Change the password of the device.
+        """
+        device = models.LdapDevice.objects.get(
+                    device_fullname=username + "_" + device_name)
+        self.change_device_password(device)
+        device.save()
+
+    @command
+    def device_del(self, username, device_name):
+        """
+        Delete a device.
+        """
+        device = models.LdapDevice.objects.get(
+                        device_fullname=username + "_" + device_name)
+        self.warn("Deleting device %s", device_name)
+        device.delete()
 
     @command
     def help(self):

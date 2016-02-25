@@ -302,6 +302,34 @@ class LdapExternalUser(ldap_models.Model):
         return super(LdapExternalUser, self).save(*args, **kwargs)
 
 
+class LdapDevice(ldap_models.Model):
+    """
+    A device for the VPN.
+    """
+    # LDAP meta-data
+    base_dn = settings.GRANADILLA_DEVICES_DN
+    object_classes = ['device', 'simpleSecurityObject']
+
+    # device
+    device_fullname = ldap_fields.CharField(_("device fullname"), db_column='cn', primary_key=True)
+    device_name = ldap_fields.CharField(_("device name"), db_column='description')
+    device_owner = ldap_fields.CharField(_("device owner"), db_column='owner')
+
+    # simpleSecurityObject   
+    password = ldap_fields.CharField(_("password"), db_column='userPassword')
+ 
+    def __str__(self):
+        return self.device_owner
+
+    def __unicode__(self):
+        return self.device_name
+
+    def set_password(self, password):
+        self.password = hash_password(password)
+
+    def save(self, *args, **kwargs):
+        return super(LdapDevice, self).save(*args, **kwargs)
+
 
 if __name__ == "__main__":
     import doctest
