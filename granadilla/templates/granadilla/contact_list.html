@@ -5,13 +5,13 @@
 {% block subtitle %}{% trans "Contacts" %}{% endblock %}
 
 {% block breadcrumbs %}
-<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; {% trans "Contacts" %}
+<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Contacts" %}
 {% endblock %}
 
 {% block content %}
 <h2>{% trans "Contacts" %}</h2>
 
-<a href="{% url granadilla.views.contact_create %}">{% trans "Add a contact" %}</a>
+<a href="{% url "granadilla.views.contact_create" %}">{% trans "Add a contact" %}</a>
 
 {% if object_list %}
 
@@ -33,12 +33,12 @@
     </tr>
 {% for object in initial.list %}
     <tr>
-      <td class="name" title="{{ object.organization }}"><a href="{% url granadilla.views.contact object.pk %}">{{ object.last_name }}, {{ object.first_name }}</a></td>
+      <td class="name" title="{{ object.organization }}"><a href="{% url "granadilla.views.contact" object.pk %}">{{ object.last_name }}, {{ object.first_name }}</a></td>
       <td class="email">{{ object.email|default_if_none:"-" }}</td>
       <td class="phone">{{ object.phone|default_if_none:"-" }}</td>
       <td class="phone">{{ object.mobile_phone|default_if_none:"-" }}</td>
-      <td><a href="{% url granadilla.views.contact_card object.pk %}">vCard</a></td>
-      <td><a href="{% url granadilla.views.contact_delete object.pk %}">{% trans "Delete" %}</a></td>
+      <td><a href="{% url "granadilla.views.contact_card" object.pk %}">vCard</a></td>
+      <td><a href="{% url "granadilla.views.contact_delete" object.pk %}">{% trans "Delete" %}</a></td>
     </tr>
 {% endfor %}
 {% endfor %}

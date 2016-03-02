@@ -1,0 +1,62 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{% trans "Devices" %}{% endblock %}
+
+{% block breadcrumbs %}
+<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Devices" %}
+{% endblock %}
+
+{% block content %}
+<h2>{% trans "Devices" %}</h2>
+
+{% if object_list %}
+
+
+{% regroup object_list by device_fullname as device_list %} 
+
+{% for initial in device_list %}
+{% for object in initial.list %}
+<table class="phonebook">
+  <tbody>
+    <tr>
+     <td>
+      <a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
+     </td>
+     <td>
+      <a href="{% url "granadilla.views.device_password" object.pk %}">{% trans "Generate password" %}</a>
+     </td>
+      <td>
+      <a href="{% url "granadilla.views.device_delete" object.pk %}">{% trans "Delete device" %}</a>
+     </td>
+    </tr>
+  </tbody>
+</table>
+<table class="phonebook">
+  <thead>
+    <tr>
+      <th>{% trans "Field" %}</th>
+      <th>{% trans "Value" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>{% trans "Owner" %}</td>
+      <td>{{ object.device_username }}</td>
+    </tr>
+    <tr>
+      <td>{% trans "Name" %}</td>
+      <td>{{ object.device_name }}</td>
+    </tr>
+  </tbody>
+</table>
+{% endfor %}
+{% endfor %}
+
+{% else %}
+<p>{% trans "This device does not exist." %}</p>
+<a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
+{% endif %}
+
+{% endblock %}

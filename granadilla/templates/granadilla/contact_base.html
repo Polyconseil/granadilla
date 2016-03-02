@@ -4,4 +4,4 @@
 
 {% block subtitle %}{% if object %}{{ object }}{% else %}{% trans "New contact" %}{% endif %}{% endblock %}
 
-{% block breadcrumbs %}<a href="{% url granadilla.views.index %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url granadilla.views.contact_list %}">{% trans "Contacts" %}</a> &rsaquo; {% if object %}{{ object }}{% else %}{% trans "New contact" %}{% endif %}{% endblock %}
+{% block breadcrumbs %}<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url "granadilla.views.contact_list" %}">{% trans "Contacts" %}</a> &rsaquo; {% if object %}{{ object }}{% else %}{% trans "New contact" %}{% endif %}{% endblock %}

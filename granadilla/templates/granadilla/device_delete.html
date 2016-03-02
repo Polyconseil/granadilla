@@ -1,7 +1,10 @@
-{% extends "granadilla/contact_base.html" %}
+{% extends "granadilla/device_base.html" %}
 {% load i18n %}
 
 {% block content %}
+
+{% if object %} 
+
 <h1>{% blocktrans %}Delete {{ object }}{% endblocktrans %}</h1>
 {% blocktrans %}Are you sure you want to delete {{ object }}?{% endblocktrans %}
 
@@ -10,9 +13,15 @@
 <input type="submit" value="{% trans "Yes" %}" />
 </form>
 
-<form action="{% url "granadilla.views.contact_list" %}" method="GET">
+<form action="{% url "device_list" %}" method="GET">
 {% csrf_token %}
 <input type="submit" value="{% trans "No" %}" />
 </form>
+
+{% else %}
+<p>{% trans "This device does not exist." %}</p>
+<a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
+
+{% endif %}
 
 {% endblock %}

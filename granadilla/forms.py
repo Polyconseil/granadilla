@@ -18,13 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import unicode_literals
 import re
 
+from . import models
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
 
-from granadilla.models import LdapContact, LdapUser
 
 class LdapContactForm(forms.ModelForm):
     postal_address = forms.CharField(required=False, label=_("Postal address"), widget=forms.Textarea)
@@ -45,8 +46,60 @@ class LdapContactForm(forms.ModelForm):
         return contact
 
     class Meta:
-        model = LdapContact
+        model = models.LdapContact
         exclude = ("dn", "photo", "full_name")
+
+
+class LdapDeviceForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        if 'base_dn' in kwargs:
+            self._base_dn = kwargs.pop('base_dn')
+        else:
+            self._base_dn = None
+
+        self._username = kwargs.pop('username')
+        self.tmppwd = kwargs.pop('tmppwd')
+
+        super(LdapDeviceForm, self).__init__(*args, **kwargs)
+
+    def is_valid(self):
+        if super(LdapDeviceForm, self).is_valid():    
+            # Check if the device already exists
+            device_fullname = self._username + '_' + \
+                        self.data['device_name']
+            try:
+                if models.LdapDevice.objects.get(device_fullname=device_fullname):
+                    self.errors['devicenameerror'] = "A device with \
+                            this name already exists"
+                    return False
+            except models.LdapDevice.DoesNotExist:
+                return True
+        return False
+
+    def save(self, commit=True):
+        device = super(LdapDeviceForm, self).save(False)
+
+        device.device_username = self._username
+        user = models.LdapUser.objects.get(username=device.device_username)
+        device.device_owner = user.dn
+        device.device_fullname = device.device_username \
+                         + '_' + self.data['device_name']
+
+        # Initialize with random password because the field is necessary
+        device.set_password(self.tmppwd)
+        self.tmppwd = ""
+
+        if self._base_dn:
+            device.base_dn = self._base_dn
+        if commit:
+            device.save()
+        return device
+
+    class Meta:
+        model = models.LdapDevice
+        exclude = ("password", "dn", "device_username", "device_owner", "device_fullname")
+
 
 class LdapUserForm(forms.ModelForm):
     new_photo = forms.ImageField(required=False, label=_("Photo"))
@@ -61,5 +114,5 @@ class LdapUserForm(forms.ModelForm):
         return contact
 
     class Meta:
-        model = LdapUser
+        model = models.LdapUser
         fields = ('phone', 'mobile_phone', 'internal_phone', 'new_photo')

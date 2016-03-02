@@ -314,15 +314,19 @@ class LdapDevice(ldap_models.Model):
     device_fullname = ldap_fields.CharField(_("device fullname"), db_column='cn', primary_key=True)
     device_name = ldap_fields.CharField(_("device name"), db_column='description')
     device_owner = ldap_fields.CharField(_("device owner"), db_column='owner')
+    device_username = ldap_fields.CharField(_("device username"), db_column='o')
 
     # simpleSecurityObject   
     password = ldap_fields.CharField(_("password"), db_column='userPassword')
  
     def __str__(self):
-        return self.device_owner
+        return self.device_username
 
     def __unicode__(self):
         return self.device_name
+
+    def check_password(self, password):
+        return self.password == hash_password(password)
 
     def set_password(self, password):
         self.password = hash_password(password)

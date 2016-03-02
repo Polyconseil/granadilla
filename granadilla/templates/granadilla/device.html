@@ -1,0 +1,27 @@
+{% extends "granadilla/device_base.html" %}
+{% load i18n %}
+
+{% block content %}
+<form method="POST">
+{% csrf_token %}
+<table class="module">
+<caption>{% if object %}{{ object }}{% else %}{% trans "Add a device" %}{% endif %}</caption>
+{% if form.errors %}
+    {% for field, error in form.errors.items %}
+        <div class="alert alert-error">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<table class="device">
+{{ form }}
+
+<tr>
+  <td>&nbsp;</td>
+  <td><button type="submit">{% if object %}{% trans "Modify" %}{% else %}{% trans "Add" %}{% endif %}</button><a href="{% url "granadilla.views.device_list" %}"><button type="button">{% trans "Cancel" %}</button></a>
+  </td>
+</tr>
+</table>
+</form>
+{% endblock %}
