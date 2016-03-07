@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 # django-granadilla
-# Copyright (C) 2009-2012 Bolloré telecom
+# Copyright (C) Bolloré telecom, Polyconseil
 # See AUTHORS file for a full list of contributors.
 # 
 # This program is free software: you can redistribute it and/or modify
@@ -23,13 +23,14 @@ Granadilla
 
 @author: Aymeric Augustin <aymeric.augustin@bolloretelecom.eu>
 @author: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
+@author: Raphaël Barrois <raphael.barrois@polyconseil.fr
 """
+
 __docformat__ = 'epytext en'
 
-__version__ = '0.1.0'
-__url__ = 'https://opensource.bolloretelecom.eu/projects/django-granadilla/'
-__copyright__ = '(C) 2009-2012 Bolloré Telecom'
+__url__ = 'https://github.com/Polyconseil/granadilla'
+__copyright__ = "(C) Bolloré Telecom, Polyconseil"
 __license__ = 'GPL'
 __license_long__ = """
- Copyright (C) 2009-2012 Bolloré Telecom
+ Copyright (C) Bolloré Telecom, Polyconseil
   All rights reserved."""
