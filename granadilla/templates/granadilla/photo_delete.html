@@ -3,14 +3,14 @@
 
 {% block subtitle %}{{ object }}{% endblock %}
 
-{% block breadcrumbs %}<a href="{% url granadilla.views.index %}">Phonebook</a> &rsaquo; {{ object }}{% endblock %}
+{% block breadcrumbs %}<a href="{% url "granadilla.views.index" %}">Phonebook</a> &rsaquo; {{ object }}{% endblock %}
 
 {% block content %}
 <table class="module">
 <caption>Remove photo</caption>
 <tr>
 <td>
-  <img src="{% url granadilla.views.photo object.pk %}"/>
+  <img src="{% url "granadilla.views.photo" object.pk %}"/>
 </td>
 <td>
   <form method="POST">
@@ -19,7 +19,7 @@
   <br/>
   <input type="submit" value="Yes, I'm sure" />
   </form>
-  <form action="{% url granadilla.views.index %}" method="GET">
+  <form action="{% url "granadilla.views.index" %}" method="GET">
   {% csrf_token %}
   <input type="submit" value="No, I'm not sure" />
   </form>

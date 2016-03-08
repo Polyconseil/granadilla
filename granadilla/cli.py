@@ -596,9 +596,10 @@ class CLI(object):
         """
         device = models.LdapDevice()
         user = models.LdapUser.objects.get(username=username)
+        device.device_username = username
         device.device_owner = user.dn
         device.device_name = self.grab("Device name: ", False) 
-        device.device_fullname = user.username + "_" + device.device_name
+        device.device_fullname = username + "_" + device.device_name
         self.change_device_password(device)
         device.save()
 

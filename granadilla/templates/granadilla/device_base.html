@@ -1,0 +1,7 @@
+{% extends "granadilla/base.html" %}
+{% load granadilla_tags %}
+{% load i18n %}
+
+{% block subtitle %}{% if object %}{{ object }}{% else %}{% trans "New device" %}{% endif %}{% endblock %}
+
+{% block breadcrumbs %}<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url "granadilla.views.device_list" %}">{% trans "Devices" %}</a> &rsaquo; {% if object %}{{ object }}{% else %}{% trans "New device" %}{% endif %}{% endblock %}

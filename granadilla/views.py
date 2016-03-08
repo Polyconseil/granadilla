@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from __future__ import unicode_literals
+
 import time
 
 from .conf import settings
@@ -32,7 +34,7 @@ from django.views.static import was_modified_since
 from django.views import generic as generic_views
 
 from granadilla.templatetags.granadilla_tags import granadilla_media
-from granadilla.forms import LdapContactForm, LdapUserForm
+from granadilla.forms import LdapContactForm, LdapDeviceForm, LdapUserForm
 from . import models
 from . import vcard
 
@@ -50,6 +52,18 @@ def get_contacts(user):
     base_dn = "ou=%s,%s" % (user.username, settings.GRANADILLA_CONTACTS_DN)
     return models.LdapContact.scoped(base_dn)
 
+def get_devices():
+    base_dn = "%s" % (settings.GRANADILLA_DEVICES_DN)
+    return models.LdapDevice.scoped(base_dn)
+
+def get_random_password(length=32, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+        import random
+        try:
+            random = random.SystemRandom()
+        except NotImplementedError:
+            pass
+        return ''.join([random.choice(allowed_chars) for i in range(length)])
+    
 def user_vcard(user):
     """Return the vCard for a contact."""
     card = vcard.VCard()
@@ -135,6 +149,127 @@ class ContactListView(generic_views.ListView):
 
 
 contact_list = login_required(ContactListView.as_view())
+
+
+class DeviceCreate(generic_views.CreateView):
+    """
+    Creating a new device
+    """
+    model = models.LdapDevice
+    template_name = 'granadilla/device.html'
+
+    form_class = LdapDeviceForm
+
+    def get_form_kwargs(self):
+        base_dn = '%s' % (settings.GRANADILLA_DEVICES_DN,)
+        kwargs = super(DeviceCreate, self).get_form_kwargs()
+        kwargs['base_dn'] = base_dn
+        kwargs['username'] = self.request.user.username
+        kwargs['tmppwd'] = get_random_password()
+        return kwargs
+
+    def get_success_url(self):
+        return reverse(device_list)
+
+device_create = login_required(DeviceCreate.as_view())
+
+class DevicePassword(generic_views.DetailView):
+    """
+    Generating a new password
+    """
+    model = models.LdapDevice
+    template_name = 'granadilla/device_password.html'
+
+    def get_object(self, queryset=None):
+        try:
+            device = get_devices().objects.get(device_fullname=self.kwargs['device_fullname'])
+        except models.LdapDevice.DoesNotExist:
+            return None
+
+        user = self.request.user
+        if user.username == device.device_username:
+            # Change the password and display it using tmppwd 
+            device.tmppwd = get_random_password()
+            device.set_password(device.tmppwd)
+            device.save()
+            return device
+        else:
+            return None
+
+    def post(self, *args, **kwargs):
+        return HttpResponseRedirect(reverse(device_list))
+
+device_password = login_required(DevicePassword.as_view())
+
+
+class DeviceDelete(generic_views.DeleteView):
+    """
+    Deleting a device
+    """
+    model = models.LdapDevice
+    template_name = 'granadilla/device_delete.html'
+
+    slug_field = 'device_fullname'
+
+    def get_object(self, queryset=None):
+        try:
+            device = get_devices().objects.get(device_fullname=self.kwargs['device_fullname'])
+        except models.LdapDevice.DoesNotExist:
+            return None
+
+        user = self.request.user
+        if user.is_superuser or user.username == device.device_username:
+            return device
+        else:
+            return None
+
+    def get_success_url(self):
+        return reverse(device_list)
+
+
+device_delete = login_required(DeviceDelete.as_view())
+
+
+class DeviceAttrView(generic_views.ListView):
+    """
+    Displaying the device's attribute
+    """
+    model = models.LdapDevice
+    template_name = 'granadilla/device_attr.html'
+
+    def get_queryset(self):
+        user = self.request.user
+
+        try:
+            device = get_devices().objects.get(device_fullname=\
+                    self.kwargs['device_fullname'])
+        except models.LdapDevice.DoesNotExist:
+            return None
+
+        if user.is_superuser or user.username == device.device_username:
+            return [device]
+        else:
+            return None
+
+
+device_attr = login_required(DeviceAttrView.as_view())
+
+class DeviceListView(generic_views.ListView):
+    """
+    Displaying the list of devices
+    """
+    model = models.LdapDevice
+    template_name = 'granadilla/device_list.html'
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser:
+            return get_devices().objects.all()
+        else:
+            return get_devices().objects.filter(device_username=user.username)
+
+
+device_list = login_required(DeviceListView.as_view())
 
 
 class GroupView(generic_views.DetailView):
