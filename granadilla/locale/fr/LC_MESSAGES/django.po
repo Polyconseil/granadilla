@@ -73,20 +73,6 @@ msgstr "nom complet"
 msgid "organization"
 msgstr "organisation"
 
-#: models.py:119 models.py:166 templates/granadilla/contact_list.html:24
-msgid "e-mail address"
-msgstr "adresse électronique"
-
-#: models.py:120 models.py:167 templates/granadilla/contact_list.html:25
-#: templates/granadilla/group.html:26
-msgid "phone"
-msgstr "téléphone"
-
-#: models.py:121 models.py:168 templates/granadilla/contact_list.html:26
-#: templates/granadilla/group.html:28
-msgid "mobile phone"
-msgstr "téléphone portable"
-
 #: models.py:122 models.py:169
 msgid "photo"
 msgstr "photo"
@@ -139,13 +125,6 @@ msgstr "utilisateur"
 msgid "users"
 msgstr "utilisateurs"
 
-#: templates/granadilla/base.html:17 templates/granadilla/contact_base.html:7
-#: templates/granadilla/contact_list.html:5
-#: templates/granadilla/contact_list.html:8
-#: templates/granadilla/contact_list.html:12
-msgid "Contacts"
-msgstr "Contacts"
-
 #: templates/granadilla/base.html:18
 msgid "Users"
 msgstr "Utilisateurs"
@@ -156,54 +135,6 @@ msgstr "Utilisateurs"
 #: templates/granadilla/group_list.html:10
 msgid "Groups"
 msgstr "Groupes"
-
-#: templates/granadilla/contact.html:8
-#: templates/granadilla/contact_list.html:14
-msgid "Add a contact"
-msgstr "Ajouter un contact"
-
-#: templates/granadilla/contact.html:13
-msgid "Modify"
-msgstr "Modifier"
-
-#: templates/granadilla/contact.html:13
-msgid "Add"
-msgstr "Ajouter"
-
-#: templates/granadilla/contact.html:13
-msgid "Cancel"
-msgstr "Annuler"
-
-#: templates/granadilla/contact_base.html:5
-#: templates/granadilla/contact_base.html:7
-msgid "New contact"
-msgstr "Nouveau contacts"
-
-#: templates/granadilla/contact_delete.html:5
-#, python-format
-msgid "Delete %(object)s"
-msgstr "Supprimer %(object)s"
-
-#: templates/granadilla/contact_delete.html:6
-#, python-format
-msgid "Are you sure you want to delete %(object)s?"
-msgstr "Etes-vous sûr(e) de vouloir supprimer %(object)s ?"
-
-#: templates/granadilla/contact_delete.html:10
-msgid "Yes"
-msgstr "Oui"
-
-#: templates/granadilla/contact_delete.html:15
-msgid "No"
-msgstr "Non"
-
-#: templates/granadilla/contact_list.html:41
-msgid "Delete"
-msgstr "Supprimer"
-
-#: templates/granadilla/contact_list.html:49
-msgid "You do not have any contacts yet."
-msgstr "Vous n'avez pas encore de contacts."
 
 #: templates/granadilla/group.html:66
 msgid "There are no users in this group."

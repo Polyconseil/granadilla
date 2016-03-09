@@ -34,7 +34,7 @@ from django.views.static import was_modified_since
 from django.views import generic as generic_views
 
 from granadilla.templatetags.granadilla_tags import granadilla_media
-from granadilla.forms import LdapContactForm, LdapDeviceForm, LdapUserForm
+from granadilla.forms import LdapDeviceForm, LdapUserForm
 from . import models
 from . import vcard
 
@@ -95,60 +95,6 @@ def index(request, template_name='granadilla/facebook.html'):
 def contact_card(request, contact_id):
     contact = get_contacts(request.user).objects.get(pk=contact_id)
     return user_vcard(contact)
-
-
-class ContactCreate(generic_views.CreateView):
-    model = models.LdapContact
-    template_name = 'granadilla/contact.html'
-
-    form_class = LdapContactForm
-
-    def get_form_kwargs(self):
-        base_dn = 'ou=%s,%s' % (self.request.user.username, settings.GRANADILLA_CONTACTS_DN)
-        kwargs = super(ContactCreate, self).get_form_kwargs()
-        kwargs['base_dn'] = base_dn
-        return kwargs
-
-    def get_success_url(self):
-        return reverse(contact_list)
-
-contact_create = login_required(ContactCreate.as_view())
-
-
-class ContactUpdate(generic_views.UpdateView):
-    model = models.LdapContact
-    template_name = 'granadilla/contact.html'
-    form_class = LdapContactForm
-
-    def get_queryset(self):
-        return get_contacts(self.request.user).objects.all()
-
-contact = login_required(ContactUpdate.as_view())
-
-
-class ContactDelete(generic_views.DeleteView):
-    model = models.LdapContact
-    template_name = 'granadilla/contact_delete.html'
-
-    def get_queryset(self):
-        return get_contacts(self.request.user).objects.all()
-
-    def get_success_url(self):
-        return reverse(contact_list)
-
-
-contact_delete = login_required(ContactDelete.as_view())
-
-
-class ContactListView(generic_views.ListView):
-    model = models.LdapContact
-    template_name = 'granadilla/contact_list.html'
-
-    def get_queryset(self):
-        return get_contacts(self.request.user).objects.all()
-
-
-contact_list = login_required(ContactListView.as_view())
 
 
 class DeviceCreate(generic_views.CreateView):

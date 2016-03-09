@@ -22,11 +22,6 @@ from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
     (r'^$', 'granadilla.views.index'),
-    (r'^contacts/$', 'granadilla.views.contact_list'),
-    (r'^contacts/create/$', 'granadilla.views.contact_create'),
-    (r'^contacts/(?P<contact_id>[^/]+)/$', 'granadilla.views.contact'),
-    (r'^contacts/(?P<contact_id>[^/]+)/card/$', 'granadilla.views.contact_card'),
-    (r'^contacts/(?P<contact_id>[^/]+)/delete/$', 'granadilla.views.contact_delete'),
     url(r'^devices/$', 'granadilla.views.device_list', name="device_list"),
     (r'^devices/create/$', 'granadilla.views.device_create'),
     (r'^devices/(?P<device_fullname>[^/]+)/$', 'granadilla.views.device_attr'),

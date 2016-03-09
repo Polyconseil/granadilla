@@ -100,44 +100,6 @@ class LdapGroup(ldap_models.Model):
         verbose_name_plural = _("groups")
 
 
-class LdapContact(ldap_models.Model):
-    """
-    Class for representing an LDAP contact entry.
-    """
-    # LDAP meta-data
-    object_classes = ['inetOrgPerson']
-
-    # inetOrgPerson
-    first_name = ldap_fields.CharField(_("first name"), db_column='givenName')
-    last_name = ldap_fields.CharField(_("last name"), db_column='sn')
-    full_name = ldap_fields.CharField(_("full name"), db_column='cn', primary_key=True)
-    organization = ldap_fields.CharField(_("organization"), db_column='o', blank=True)
-    email = ldap_fields.CharField(_("e-mail address"), db_column='mail', blank=True)
-    phone = ldap_fields.CharField(_("phone"), db_column='telephoneNumber', blank=True)
-    mobile_phone = ldap_fields.CharField(_("mobile phone"), db_column='mobile', blank=True)
-    photo = ldap_fields.ImageField(_("photo"), db_column='jpegPhoto')
-    postal_address = ldap_fields.CharField(_("postal address"), db_column='postalAddress', blank=True)
-
-    def __unicode__(self):
-        return self.full_name
-
-    def last_name_initial(self):
-        if len(self.last_name) > 0:
-            return self.last_name[0].upper()
-        else:
-            return ''
-
-    def save(self):
-        self.full_name = "%s %s" % (self.first_name, self.last_name)
-        super(LdapContact, self).save()
-
-    class Meta:
-        abstract = True
-        ordering = ('last_name', 'first_name')
-        verbose_name = _("contact")
-        verbose_name_plural = _("contacts")
-
-
 class LdapServiceAccount(ldap_models.Model):
     """Class for a Service account."""
     # LDAP meta-data

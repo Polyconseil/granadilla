@@ -27,29 +27,6 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
 
 
-class LdapContactForm(forms.ModelForm):
-    postal_address = forms.CharField(required=False, label=_("Postal address"), widget=forms.Textarea)
-
-    def __init__(self, *args, **kwargs):
-        if 'base_dn' in kwargs:
-            self.__base_dn = kwargs.pop('base_dn')
-        else:
-            self.__base_dn = None
-        super(LdapContactForm, self).__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        contact = super(LdapContactForm, self).save(False)
-        if self.__base_dn:
-            contact.base_dn = self.__base_dn
-        if commit:
-            contact.save()
-        return contact
-
-    class Meta:
-        model = models.LdapContact
-        exclude = ("dn", "photo", "full_name")
-
-
 class LdapDeviceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
