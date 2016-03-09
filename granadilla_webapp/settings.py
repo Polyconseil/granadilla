@@ -130,9 +130,6 @@ GRANADILLA_DEVICES_DN = '%s,%s' % (GRANADILLA_DEVICES_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for services
 GRANADILLA_SERVICES_OU = config.get('granadilla.services_ou', 'ou=services')
 GRANADILLA_SERVICES_DN = '%s,%s' % (GRANADILLA_SERVICES_OU, GRANADILLA_BASE_DN)
-# The organizationalUnit for contacts
-GRANADILLA_CONTACTS_OU = config.get('granadilla.contacts_ou', 'ou=contacts')
-GRANADILLA_CONTACTS_DN = '%s,%s' % (GRANADILLA_CONTACTS_OU, GRANADILLA_BASE_DN)
 # The organizationalUnit for acls
 GRANADILLA_ACLS_OU = config.get('granadilla.acls_ou', 'ou=acls')
 GRANADILLA_ACLS_DN = '%s,%s' % (GRANADILLA_ACLS_OU, GRANADILLA_BASE_DN)
@@ -153,4 +150,4 @@ GRANADILLA_USE_SAMBA = config.getbool('granadilla.use_samba', False)
 GRANADILLA_SAMBA_PREFIX = config.get('granadilla.samba_prefix', 'S-1-0-0')
 
 # URL from which Granadilla's static media are served.
-GRANADILLA_MEDIA_PREFIX = STATIC_URL
+GRANADILLA_MEDIA_PREFIX = os.path.join(STATIC_URL, 'granadilla')

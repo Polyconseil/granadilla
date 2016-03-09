@@ -26,8 +26,11 @@ Granadilla
 @author: Raphaël Barrois <raphael.barrois@polyconseil.fr
 """
 
+from granadilla.version import VERSION
+
 __docformat__ = 'epytext en'
 
+__version__ = VERSION
 __url__ = 'https://github.com/Polyconseil/granadilla'
 __copyright__ = "(C) Bolloré Telecom, Polyconseil"
 __license__ = 'GPL'
