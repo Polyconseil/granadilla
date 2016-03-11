@@ -8,7 +8,7 @@
 <link rel="stylesheet" type="text/css" href="{% static "granadilla/css/granadilla.css" %}" />
 {% endblock %}
 
-{% block branding %}<h1 id="site-name">{% granadilla_version %}</h1>{% endblock %}
+{% block branding %}<h1 id="site-name">{% autoescape off %}{% granadilla_version %}{% endautoescape %}</h1>{% endblock %}
 
 {% block related %}
 <div class="module">
