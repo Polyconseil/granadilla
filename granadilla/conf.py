@@ -43,6 +43,8 @@ class GranadillaConf(appconf.AppConf):
     GROUPS_DN = 'ou=groups,dc=example,dc=org'
     SERVICES_DN = 'ou=services,dc=example,dc=org'
     USERS_DN = 'ou=users,dc=example,dc=org'
+    DEVICES_DN = 'ou=devices,dc=example,dc=org'
+    DEVICEGROUPS_DN = DEVICES_DN
     USE_ACLS = False
 
     # Homepage: "full company" group name

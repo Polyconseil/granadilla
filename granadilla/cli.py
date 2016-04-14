@@ -51,7 +51,7 @@ else:
         return txt
 
 # configure logging
-logger = logging.getLogger()
+logger = logging.getLogger(__name__.split('.')[0])
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)-8s %(message)s'))
 logger.addHandler(handler)
@@ -235,6 +235,7 @@ class CLI(object):
                 acl.name = groupname
                 acl.members = [ user.dn ]
                 acl.save()
+        self.sync_device_acls()
 
     @command
     def catgroup(self, groupname):
@@ -283,6 +284,7 @@ class CLI(object):
         group = models.LdapGroup.objects.get(name=groupname)
 
         self._delusergroup(user, group)
+        self.sync_device_acls()
 
     def _delusergroup(self, user, group):
         if user.username in group.usernames:
@@ -313,6 +315,7 @@ class CLI(object):
 
         self.warn("Removing user %s", user.dn)
         user.delete()
+        self.sync_device_acls()
 
     @command
     def init(self):
@@ -602,6 +605,7 @@ class CLI(object):
         device.device_fullname = username + "_" + device.device_name
         self.change_device_password(device)
         device.save()
+        self.sync_device_acls()
 
     @command
     def device_password(self, username, device_name):
@@ -622,6 +626,27 @@ class CLI(object):
                         device_fullname=username + "_" + device_name)
         self.warn("Deleting device %s", device_name)
         device.delete()
+
+    @command
+    def device_group_add(self, group_name):
+        """
+        Add a device group; must relate to an existing group.
+        """
+        group = models.LdapGroup.objects.get(name=group_name)
+        device_group = models.LdapDeviceGroup.objects.create(
+            name=group_name,
+            group_dn=group.dn,
+        )
+        device_group.resync()
+        self.display("Created DeviceGroup %s with members %s", device_group, device_group.members)
+
+    @command
+    def sync_device_acls(self):
+        """
+        Synchronize device ACLs.
+        """
+        for device_group in models.LdapDeviceGroup.objects.all():
+            device_group.resync()
 
     @command
     def help(self):
@@ -657,6 +682,8 @@ Commands:
             self.error("Unknown command %s", cmd)
             self.help()
             return 1
+
+        args = [force_text(arg) for arg in args]
 
         try:
             meth(*args)

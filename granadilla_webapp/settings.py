@@ -127,6 +127,8 @@ GRANADILLA_EXTERNAL_USERS_DN = '%s,%s' % (GRANADILLA_EXTERNAL_USERS_OU, GRANADIL
 # The organizationalUnit for devices
 GRANADILLA_DEVICES_OU = config.get('granadilla.devices_ou', 'ou=external_users')
 GRANADILLA_DEVICES_DN = '%s,%s' % (GRANADILLA_DEVICES_OU, GRANADILLA_BASE_DN)
+GRANADILLA_DEVICEGROUPS_DN = GRANADILLA_DEVICES_DN
+
 # The organizationalUnit for services
 GRANADILLA_SERVICES_OU = config.get('granadilla.services_ou', 'ou=services')
 GRANADILLA_SERVICES_DN = '%s,%s' % (GRANADILLA_SERVICES_OU, GRANADILLA_BASE_DN)

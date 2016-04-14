@@ -27,6 +27,8 @@ try:
 except ImportError:
     import md5
     md5_constructor = md5.new
+
+import logging
 import os
 import time
 import unicodedata
@@ -37,6 +39,8 @@ from django.utils.translation import ugettext_lazy as _
 from ldapdb import models as ldap_models
 from ldapdb.models import fields as ldap_fields
 
+
+logger = logging.getLogger(__name__.split('.')[0])
 
 
 def normalise(str):
@@ -100,6 +104,9 @@ class LdapGroup(ldap_models.Model):
         ordering = ('name',)
         verbose_name = _("group")
         verbose_name_plural = _("groups")
+
+    def get_members(self):
+        return LdapUser.objects.get(username__in=self.usernames)
 
 
 class LdapServiceAccount(ldap_models.Model):
@@ -297,6 +304,57 @@ class LdapDevice(ldap_models.Model):
 
     def save(self, *args, **kwargs):
         return super(LdapDevice, self).save(*args, **kwargs)
+
+
+class LdapDeviceGroup(ldap_models.Model):
+    """
+    A group of devices.
+    """
+    # LDAP meta-data
+    base_dn = settings.GRANADILLA_DEVICEGROUPS_DN
+    object_classes = ['groupOfNames', 'alias']
+
+    name = ldap_fields.CharField(_("name"), db_column='cn', primary_key=True)
+    group_dn = ldap_fields.CharField(_("target group"), db_column='aliasedObjectName', unique=True)
+    members = ldap_fields.ListField(_("members"), db_column='member')
+
+    def __str__(self):
+        return self.name
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ('cn',)
+        verbose_name = _("device group")
+        verbose_name_plural = _("device groups")
+
+    @property
+    def group(self):
+        return LdapGroup.objects.get(dn=self.group_dn)
+
+    @for_group.setter
+    def set_group(self, group):
+        self.group_dn = group.dn
+
+    def resync(self):
+        owners = self.group.get_members()
+        owner_dns = [owner.dn for owner in owners]
+        devices = LdapDevice.objects.filter(owner__in=owner_dns)
+        members = [device.dn for device in devices]
+
+        old_members = set(self.members)
+        new_members = set(members)
+
+        added = sorted(new_members - old_members)
+        removed = sorted(old_members - new_members)
+        if added:
+            logger.info("Group %s: added devices %s" % ', '.join(sorted(added)))
+        if removed:
+            logger.info("Group %s: removed devices %s" % ', '.join(sorted(removed)))
+        if added or removed:
+            self.members = members
+            self.save()
 
 
 if __name__ == "__main__":
