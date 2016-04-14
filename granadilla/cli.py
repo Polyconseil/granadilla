@@ -235,7 +235,6 @@ class CLI(object):
                 acl.name = groupname
                 acl.members = [ user.dn ]
                 acl.save()
-        self.sync_device_acls()
 
     @command
     def catgroup(self, groupname):
@@ -276,6 +275,7 @@ class CLI(object):
                 models.LdapAcl.objects.get(name=groupname).delete()
             except models.LdapAcl.DoesNotExist:
                 pass
+        self.sync_device_acls()
 
     @command
     def delusergroup(self, username, groupname):
@@ -284,7 +284,6 @@ class CLI(object):
         group = models.LdapGroup.objects.get(name=groupname)
 
         self._delusergroup(user, group)
-        self.sync_device_acls()
 
     def _delusergroup(self, user, group):
         if user.username in group.usernames:
@@ -315,7 +314,6 @@ class CLI(object):
 
         self.warn("Removing user %s", user.dn)
         user.delete()
-        self.sync_device_acls()
 
     @command
     def init(self):

@@ -108,6 +108,18 @@ class LdapGroup(ldap_models.Model):
     def get_members(self):
         return LdapUser.objects.get(username__in=self.usernames)
 
+    def save(self, *args, **kwargs):
+        res = super(LdapGroup, self).save(*args, **kwargs)
+
+        try:
+            device_group = LdapDeviceGroup.objects.get(group_dn=self.dn)
+        except LdapDeviceGroup.DoesNotExist:
+            pass
+        else:
+            device_group.resync()
+
+        return res
+
 
 class LdapServiceAccount(ldap_models.Model):
     """Class for a Service account."""
