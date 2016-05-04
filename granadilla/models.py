@@ -372,9 +372,9 @@ class LdapDeviceGroup(ldap_models.Model):
         added = sorted(new_members - old_members)
         removed = sorted(old_members - new_members)
         if added:
-            logger.info("Group %s: added devices %s" % ', '.join(sorted(added)))
+            logger.info("Group %s: added devices %s", self.name, ', '.join(sorted(added)))
         if removed:
-            logger.info("Group %s: removed devices %s" % ', '.join(sorted(removed)))
+            logger.info("Group %s: removed devices %s", self.name, ', '.join(sorted(removed)))
         if added or removed:
             self.members = members
             self.save()
