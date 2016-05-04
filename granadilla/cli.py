@@ -635,8 +635,7 @@ class CLI(object):
             name=group_name,
             group_dn=group.dn,
         )
-        device_group.save()
-        device_group.resync()
+        device_group.init()
         self.display("Created DeviceGroup %s with members %s", device_group, device_group.members)
 
     @command

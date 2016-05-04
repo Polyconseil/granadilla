@@ -349,11 +349,19 @@ class LdapDeviceGroup(ldap_models.Model):
     def set_group(self, group):
         self.group_dn = group.dn
 
-    def resync(self):
+    def _get_expected_members(self):
         owners = self.group.get_members()
         owner_dns = [owner.dn for owner in owners]
         devices = LdapDevice.objects.filter(owner__in=owner_dns)
-        members = [device.dn for device in devices]
+        return [device.dn for device in devices]
+
+    def init(self, save=True):
+        self.members = self._get_expected_members()
+        if save:
+            self.save()
+
+    def resync(self):
+        members = self._get_expected_members()
 
         old_members = set(self.members)
         new_members = set(members)
