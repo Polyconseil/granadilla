@@ -106,7 +106,7 @@ class LdapGroup(ldap_models.Model):
         verbose_name_plural = _("groups")
 
     def get_members(self):
-        return LdapUser.objects.get(username__in=self.usernames)
+        return LdapUser.objects.filter(username__in=self.usernames)
 
     def save(self, *args, **kwargs):
         res = super(LdapGroup, self).save(*args, **kwargs)
