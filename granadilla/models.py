@@ -355,7 +355,7 @@ class LdapDeviceGroup(ldap_models.Model):
     def _get_expected_members(self):
         owners = self.group.get_members()
         owner_dns = [owner.dn for owner in owners]
-        devices = LdapDevice.objects.filter(owner__in=owner_dns)
+        devices = LdapDevice.objects.filter(device_owner__in=owner_dns)
         return [device.dn for device in devices]
 
     def init(self, save=True):
