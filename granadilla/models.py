@@ -345,7 +345,7 @@ class LdapDeviceGroup(ldap_models.Model):
     def group(self):
         return LdapGroup.objects.get(dn=self.group_dn)
 
-    @for_group.setter
+    @group.setter
     def set_group(self, group):
         self.group_dn = group.dn
 
