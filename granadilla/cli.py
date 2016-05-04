@@ -631,10 +631,11 @@ class CLI(object):
         Add a device group; must relate to an existing group.
         """
         group = models.LdapGroup.objects.get(name=group_name)
-        device_group = models.LdapDeviceGroup.objects.create(
+        device_group = models.LdapDeviceGroup(
             name=group_name,
             group_dn=group.dn,
         )
+        device_group.save()
         device_group.resync()
         self.display("Created DeviceGroup %s with members %s", device_group, device_group.members)
 
