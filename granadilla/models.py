@@ -229,7 +229,7 @@ class LdapUser(ldap_models.Model):
         if settings.GRANADILLA_USE_SAMBA:
             import smbpasswd
             self.samba_ntpassword = smbpasswd.nthash(password)
-            self.samba_lmpassword = smbpasswd.lmhash(password)
+            self.samba_lmpassword = smbpasswd.lmhash(password.encode('utf-8'))
             self.samba_pwdlastset = int(time.time())
 
     def save(self):
