@@ -324,10 +324,10 @@ class LdapDeviceGroup(ldap_models.Model):
     """
     # LDAP meta-data
     base_dn = settings.GRANADILLA_DEVICEGROUPS_DN
-    object_classes = ['groupOfNames', 'alias']
+    object_classes = ['groupOfNames']
 
     name = ldap_fields.CharField(_("name"), db_column='cn', primary_key=True)
-    group_dn = ldap_fields.CharField(_("target group"), db_column='aliasedObjectName', unique=True)
+    group_dn = ldap_fields.CharField(_("target group"), db_column='seeAlso', unique=True)
     members = ldap_fields.ListField(_("members"), db_column='member')
 
     def __str__(self):
