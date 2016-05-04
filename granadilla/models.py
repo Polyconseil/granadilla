@@ -343,7 +343,10 @@ class LdapDeviceGroup(ldap_models.Model):
 
     @property
     def group(self):
-        return LdapGroup.objects.get(dn=self.group_dn)
+        for group in LdapGroup.objects.all():
+            if group.dn == self.group_dn:
+                return group
+        raise LdapGroup.DoesNotExist("Related group %s not found!!" % self.group_dn)
 
     @group.setter
     def set_group(self, group):
