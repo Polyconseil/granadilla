@@ -30,7 +30,7 @@
 {% for initial in device_list %}
 {% for object in initial.list %}
     <tr>
-      <td>{{ object.device_username }}</a></td>
+      <td>{{ object.device_fullname }}</a></td>
       <td><a href="{% url "granadilla.views.device_attr" object.pk %}">{{ object.device_name }}</td>
       <td><a href="{% url "granadilla.views.device_password" object.pk %}">{% trans "Generate password" %}</a></td>
       <td><a href="{% url "granadilla.views.device_delete" object.pk %}">{% trans "Delete" %}</a></td>
