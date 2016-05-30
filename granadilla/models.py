@@ -347,7 +347,7 @@ class LdapDeviceGroup(ldap_models.Model):
         return self.name
 
     class Meta:
-        ordering = ('cn',)
+        ordering = ('name',)
         verbose_name = _("device group")
         verbose_name_plural = _("device groups")
 
