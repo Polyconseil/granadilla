@@ -232,6 +232,14 @@ class LdapUser(ldap_models.Model):
             self.samba_lmpassword = smbpasswd.lmhash(password.encode('utf-8'))
             self.samba_pwdlastset = int(time.time())
 
+    def resync_devices(self):
+        for group in LdapGroup.objects.filter(usernames=self.username):
+            try:
+                device_group = LdapDeviceGroup.objects.get(group_dn=group.dn)
+            except LdapDeviceGroup.DoesNotExist:
+                continue
+            device_group.resync()
+
     def save(self):
         if settings.GRANADILLA_USE_SAMBA and not self.samba_sid:
             self.samba_sid = "%s-%i" % (settings.GRANADILLA_SAMBA_PREFIX, self.uid * 2 + 1000)
@@ -315,6 +323,8 @@ class LdapDevice(ldap_models.Model):
         self.password = hash_password(password)
 
     def save(self, *args, **kwargs):
+        owner = LdapUser.objects.get(dn=self.device_owner)
+        owner.resync_devices()
         return super(LdapDevice, self).save(*args, **kwargs)
 
 
