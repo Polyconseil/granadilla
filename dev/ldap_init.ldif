@@ -1,0 +1,13 @@
+# Organization for Example Corporation
+dn: dc=example,dc=org
+objectClass: dcObject
+objectClass: organization
+dc: example
+o: Example Corporation
+description: The Example Corporation
+
+# Organizational Role for Directory Manager
+dn: cn=admin,dc=example,dc=org
+objectClass: organizationalRole
+cn: Manager
+description: Directory Manager

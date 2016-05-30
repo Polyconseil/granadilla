@@ -2,6 +2,9 @@
 local_settings.ini
 granadilla_webapp/db.sqlite3
 
+# Development data
+dev/data
+
 # Temporary files
 .*.swp
 *.pyc

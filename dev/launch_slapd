@@ -1,0 +1,11 @@
+#!/bin/bash
+cd $(dirname $0);
+
+/usr/sbin/slapadd \
+    -f slapd.conf \
+    -l ldap_init.ldif
+
+/usr/lib/openldap/slapd \
+    -f slapd.conf \
+    -d 255 \
+    -h "ldap://localhost:1389/ ldapi://data%2Fopenldap%2Fslapd.sock"
