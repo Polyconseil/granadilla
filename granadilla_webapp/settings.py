@@ -48,6 +48,7 @@ ALLOWED_HOSTS = config.getlist('django.allowed_hosts')
 
 INSTALLED_APPS = (
     'granadilla',
+    'papaya.server',
     'granadilla_webapp.web',
 
     'django.contrib.admin',
@@ -65,6 +66,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+AUTHENTICATION_BACKENDS = (
+    'papaya.backends.ldapauth.LdapBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 ROOT_URLCONF = 'granadilla_webapp.urls'
@@ -153,3 +159,8 @@ GRANADILLA_SAMBA_PREFIX = config.get('granadilla.samba_prefix', 'S-1-0-0')
 
 # URL from which Granadilla's static media are served.
 GRANADILLA_MEDIA_PREFIX = os.path.join(STATIC_URL, 'granadilla')
+
+
+PAPAYA_LDAP_SERVER_URI = LDAPDB_SERVER_URI
+PAPAYA_LDAP_GROUPS_DN = GRANADILLA_GROUPS_DN
+PAPAYA_LDAP_USERS_DN = GRANADILLA_USERS_DN
