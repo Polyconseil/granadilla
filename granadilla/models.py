@@ -233,7 +233,7 @@ class LdapUser(ldap_models.Model):
             self.samba_pwdlastset = int(time.time())
 
     def resync_devices(self):
-        for group in LdapGroup.objects.filter(usernames=self.username):
+        for group in LdapGroup.objects.filter(usernames__contains=self.username):
             try:
                 device_group = LdapDeviceGroup.objects.get(group_dn=group.dn)
             except LdapDeviceGroup.DoesNotExist:
@@ -323,7 +323,14 @@ class LdapDevice(ldap_models.Model):
         self.password = hash_password(password)
 
     def save(self, *args, **kwargs):
-        owner = LdapUser.objects.get(dn=self.device_owner)
+        owner = None
+        for u in LdapUser.objects.all():
+            if u.dn == self.device_owner:
+                owner = u
+                break
+
+        if owner is None:
+            raise LdapUser.DoesNotExist("No user found at %s" % self.device_owner)
         owner.resync_devices()
         return super(LdapDevice, self).save(*args, **kwargs)
 
