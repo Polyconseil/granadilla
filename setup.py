@@ -26,7 +26,7 @@ setup(
         'Django>=1.7,<1.8',
 
         # Databases
-        'django-ldapdb-pyldap',
+        'django-ldapdb>=0.5.0',
 
         # Configuration
         'django-appconf',
