@@ -240,10 +240,10 @@ class LdapUser(ldap_models.Model):
                 continue
             device_group.resync()
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if settings.GRANADILLA_USE_SAMBA and not self.samba_sid:
             self.samba_sid = "%s-%i" % (settings.GRANADILLA_SAMBA_PREFIX, self.uid * 2 + 1000)
-        super(LdapUser, self).save()
+        super(LdapUser, self).save(*args, **kwargs)
         
     class Meta:
         ordering = ('last_name', 'first_name')
@@ -323,6 +323,7 @@ class LdapDevice(ldap_models.Model):
         self.password = hash_password(password)
 
     def save(self, *args, **kwargs):
+        res = super(LdapDevice, self).save(*args, **kwargs)
         owner = None
         for u in LdapUser.objects.all():
             if u.dn == self.device_owner:
@@ -332,7 +333,7 @@ class LdapDevice(ldap_models.Model):
         if owner is None:
             raise LdapUser.DoesNotExist("No user found at %s" % self.device_owner)
         owner.resync_devices()
-        return super(LdapDevice, self).save(*args, **kwargs)
+        return res
 
 
 class LdapDeviceGroup(ldap_models.Model):
