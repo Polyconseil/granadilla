@@ -324,14 +324,7 @@ class LdapDevice(ldap_models.Model):
 
     def save(self, *args, **kwargs):
         res = super(LdapDevice, self).save(*args, **kwargs)
-        owner = None
-        for u in LdapUser.objects.all():
-            if u.dn == self.device_owner:
-                owner = u
-                break
-
-        if owner is None:
-            raise LdapUser.DoesNotExist("No user found at %s" % self.device_owner)
+        owner = LdapUser.objects.get(dn=self.owner_dn)
         owner.resync_devices()
         return res
 
