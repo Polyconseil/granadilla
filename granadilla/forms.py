@@ -27,53 +27,40 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.utils.translation import ugettext as _
 
 
-class LdapDeviceForm(forms.ModelForm):
+class LdapDeviceForm(forms.Form):
 
-    def __init__(self, *args, **kwargs):
-        if 'base_dn' in kwargs:
-            self._base_dn = kwargs.pop('base_dn')
-        else:
-            self._base_dn = None
+    name = forms.CharField(label=_("Name (e.g 'laptop')"), max_length=42)
 
-        self._username = kwargs.pop('username')
-        self.tmppwd = kwargs.pop('tmppwd')
-
+    def __init__(self, target_user, instance=None, *args, **kwargs):
+        self.target_user = target_user
+        assert instance is None
         super(LdapDeviceForm, self).__init__(*args, **kwargs)
 
-    def is_valid(self):
-        if super(LdapDeviceForm, self).is_valid():    
-            # Check if the device already exists
-            login = self._username + '_' + self.data['name']
-            try:
-                if models.LdapDevice.objects.get(login=login):
-                    self.errors['devicenameerror'] = "A device with \
-                            this name already exists"
-                    return False
-            except models.LdapDevice.DoesNotExist:
-                return True
-        return False
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        login = '%s_%s' % (self.target_user.username, name)
+
+        if models.LdapDevice.objects.filter(login=login).exists():
+            raise forms.ValidationError(_("A device with name %s already exists") % name)
+
+        return name
 
     def save(self, commit=True):
-        device = super(LdapDeviceForm, self).save(False)
+        # target_user might be a Django User object
+        user = models.LdapUser.objects.get(username=self.target_user.username)
+        name = self.data['name']
+        login = '%s_%s' % (user.username, name)
 
-        device.owner_username = self._username
-        user = models.LdapUser.objects.get(username=device.owner_username)
-        device.owner_dn = user.dn
-        device.login = device.owner_username + '_' + self.data['name']
+        device = models.LdapDevice(
+            owner_username=user.username,
+            owner_dn=user.dn,
+            login=login,
+            name=name,
+        )
+        device.set_password()
+        device.save()
 
-        # Initialize with random password because the field is necessary
-        device.set_password(self.tmppwd)
-        self.tmppwd = ""
-
-        if self._base_dn:
-            device.base_dn = self._base_dn
-        if commit:
-            device.save()
         return device
-
-    class Meta:
-        model = models.LdapDevice
-        exclude = ("password", "dn", "owner_username", "owner_dn", "login")
 
 
 class LdapUserForm(forms.ModelForm):

@@ -15,28 +15,20 @@
 
 {% if object_list %}
 
-{% regroup object_list|dictsort:"owner_username" by owner_username as device_list %}
-
-
 <table class="phonebook">
   <thead>
     <tr>
       <th>{% trans "Owner" %}</th>
-      <th>{% trans "Device name" %}</th>
-      <th></th>
+      <th>{% trans "Device login" %}</th>
     </tr>
   </thead>
   <tbody>
-{% for initial in device_list %}
-{% for object in initial.list %}
+    {% for device in devices %}
     <tr>
-      <td>{{ object.login }}</a></td>
-      <td><a href="{% url "granadilla.views.device_attr" object.pk %}">{{ object.login }}</td>
-      <td><a href="{% url "granadilla.views.device_password" object.pk %}">{% trans "Generate password" %}</a></td>
-      <td><a href="{% url "granadilla.views.device_delete" object.pk %}">{% trans "Delete" %}</a></td>
+      <td>{{ device.owner_username }}</td>
+      <td><a href="{% url "device_details" device.login %}">{{ device.login }}</a></td>
     </tr>
-{% endfor %}
-{% endfor %}
+    {% endfor %}
   </tbody>
 </table>
 

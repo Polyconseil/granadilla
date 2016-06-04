@@ -9,54 +9,27 @@
 {% endblock %}
 
 {% block content %}
-<h2>{% trans "Devices" %}</h2>
+<h2>{% trans "Device details" %}</h2>
 
-{% if object_list %}
-
-
-{% regroup object_list by login as device_list %}
-
-{% for initial in device_list %}
-{% for object in initial.list %}
 <table class="phonebook">
   <tbody>
     <tr>
-     <td>
-      <a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
-     </td>
-     <td>
-      <a href="{% url "granadilla.views.device_password" object.pk %}">{% trans "Generate password" %}</a>
-     </td>
-      <td>
-      <a href="{% url "granadilla.views.device_delete" object.pk %}">{% trans "Delete device" %}</a>
-     </td>
+      <th>{% trans "Owner" %}</th>
+      <td>{{ device.owner_username }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Name" %}</th>
+      <td>{{ device.name }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Login" %}</th>
+      <td>{{ device.login }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Password" %}</th>
+      <td><a href="{% url "granadilla.views.device_password" device.login %}">{% trans "Regenerate password" %}</a></td>
     </tr>
   </tbody>
 </table>
-<table class="phonebook">
-  <thead>
-    <tr>
-      <th>{% trans "Field" %}</th>
-      <th>{% trans "Value" %}</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>{% trans "Owner" %}</td>
-      <td>{{ object.owner_username }}</td>
-    </tr>
-    <tr>
-      <td>{% trans "Name" %}</td>
-      <td>{{ object.login }}</td>
-    </tr>
-  </tbody>
-</table>
-{% endfor %}
-{% endfor %}
-
-{% else %}
-<p>{% trans "This device does not exist." %}</p>
-<a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
-{% endif %}
 
 {% endblock %}

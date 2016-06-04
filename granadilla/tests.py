@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.auth import models as auth_models
 from django.core.urlresolvers import reverse
 from django import test as django_test
 
@@ -34,8 +35,10 @@ class LdapBasedTestCase(django_test.TestCase):
 
 
 class DeviceTests(LdapBasedTestCase):
-    def test_add_user_group_device(self):
-        user = models.LdapUser(
+    def setUp(self):
+        super(DeviceTests, self).setUp()
+
+        self.user = models.LdapUser(
             uid=123,
             first_name="John",
             last_name="Doe",
@@ -45,16 +48,19 @@ class DeviceTests(LdapBasedTestCase):
             group=1234,
             username='jdoe',
         )
-        user.save()
-        group = models.LdapGroup(
+        self.user.set_password('yay')
+        self.user.save()
+        self.group = models.LdapGroup(
             gid=1234,
             name="test-group",
-            usernames=[user.username],
+            usernames=[self.user.username],
         )
-        group.save()
+        self.group.save()
+
+    def test_add_user_group_device(self):
 
         device = models.LdapDevice(
-            owner_dn=user.dn,
+            owner_dn=self.user.dn,
             name="My shiny laptop",
             owner_username='laptop',
             login='jdoe_laptop',
@@ -62,16 +68,16 @@ class DeviceTests(LdapBasedTestCase):
         device.set_password('sesame')
         device.save()
         device_group = models.LdapDeviceGroup(
-            name=group.name,
-            group_dn=group.dn,
+            name=self.group.name,
+            group_dn=self.group.dn,
             members=[device.dn],
         )
         device_group.save()
 
         device2 = models.LdapDevice(
-            owner_dn=user.dn,
-            name="My awesome smartphone",
-            owner_username='smartphone',
+            owner_dn=self.user.dn,
+            name="smartphone",
+            owner_username='jdoe',
             login='jdoe_smartphone',
         )
         device2.set_password('sesame!!')
@@ -80,29 +86,130 @@ class DeviceTests(LdapBasedTestCase):
         dg = models.LdapDeviceGroup.objects.get()
         self.assertEqual([device.dn, device2.dn], dg.members)
 
+    def test_web_view_device(self):
+        device = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="laptop",
+            owner_username='jdoe',
+            login='jdoe_laptop',
+        )
+        device.set_password('sesame')
+        device.save()
+
+        self.client.login(username='jdoe', password='yay')
+
+        response = self.client.get(
+            reverse('device_details', args=(device.login,)),
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'granadilla/device_attr.html')
+        self.assertContains(response, 'jdoe_laptop')
+
+    def test_web_change_password(self):
+        device = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="laptop",
+            owner_username='jdoe',
+            login='jdoe_laptop',
+        )
+        device.set_password('sesame')
+        device.save()
+
+        self.client.login(username='jdoe', password='yay')
+        response = self.client.post(
+            reverse('device_password', args=(device.login,)),
+        )
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'granadilla/device_password.html')
+        pwd = response.context['password']
+        self.assertContains(response, pwd)
+
+        device = models.LdapDevice.objects.get(dn=device.dn)
+        self.assertTrue(device.check_password(pwd))
+
+    def test_list_devices(self):
+        device1 = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="laptop",
+            owner_username='jdoe',
+            login='jdoe_laptop',
+        )
+        device1.set_password()
+        device1.save()
+
+        device2 = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="desktop",
+            owner_username='jdoe',
+            login='jdoe_desktop',
+        )
+        device2.set_password()
+        device2.save()
+
+        self.client.login(username='jdoe', password='yay')
+        response = self.client.get(reverse('device_list'))
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'granadilla/device_list.html')
+        self.assertContains(response, 'jdoe_laptop')
+        self.assertContains(response, 'jdoe_desktop')
+
+    def test_list_devices_superuser(self):
+        admin = auth_models.User.objects.create(username='admin', is_superuser=True)
+        admin.set_password('MAGIC!')
+        admin.save()
+
+        device1 = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="laptop",
+            owner_username='jdoe',
+            login='jdoe_laptop',
+        )
+        device1.set_password()
+        device1.save()
+
+        device2 = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="desktop",
+            owner_username='jdoe',
+            login='jdoe_desktop',
+        )
+        device2.set_password()
+        device2.save()
+
+        self.client.login(username='admin', password='MAGIC!')
+        response = self.client.get(reverse('device_list'))
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'granadilla/device_list.html')
+        self.assertContains(response, 'jdoe_laptop')
+        self.assertContains(response, 'jdoe_desktop')
+
+    def test_list_devices_filtering(self):
+        spy = auth_models.User.objects.create(username='spy')
+        spy.set_password('Bond.')
+        spy.save()
+
+        device = models.LdapDevice(
+            owner_dn=self.user.dn,
+            name="laptop",
+            owner_username='jdoe',
+            login='jdoe_laptop',
+        )
+        device.set_password()
+        device.save()
+
+        self.client.login(username='spy', password='Bond.')
+        response = self.client.get(reverse('device_list'))
+        self.assertEqual(200, response.status_code)
+        self.assertTemplateUsed(response, 'granadilla/device_list.html')
+        self.assertNotContains(response, 'jdoe_laptop')
+
+        # No access to objects in any way.
+        response = self.client.get(reverse('device_details', args=('jdoe_laptop',)))
+        self.assertEqual(404, response.status_code)
+        response = self.client.get(reverse('device_password', args=('jdoe_laptop',)))
+        self.assertEqual(404, response.status_code)
+
     def test_web_add_device(self):
-        # Add the user
-        user = models.LdapUser(
-            uid=123,
-            first_name="John",
-            last_name="Doe",
-            full_name="John Doe",
-            home_directory='/home/jdoe',
-            email='john.doe@example.org',
-            group=1234,
-            username='jdoe',
-        )
-        user.set_password('yay')
-        user.save()
-
-        # And its group
-        group = models.LdapGroup(
-            gid=1234,
-            name="test-group",
-            usernames=[user.username],
-        )
-        group.save()
-
         # Add a device
         self.client.login(username='jdoe', password='yay')
         response = self.client.post(
@@ -122,13 +229,23 @@ class DeviceTests(LdapBasedTestCase):
             reverse('device_password', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
-        pwd = response.context['object'].tmppwd
-        self.assertIsNotNone(pwd)
+        response = self.client.post(
+            reverse('device_password', args=(device.login,)),
+        )
+        self.assertEqual(200, response.status_code)
+        device = response.context['device']
+        pwd = response.context['password']
+        # The password is displayed to the user
+        self.assertContains(response, pwd)
+
+        # The password is now in use by the device
+        device = models.LdapDevice.objects.get(dn=device.dn)
+        self.assertTrue(device.check_password(pwd))
 
         # Create group
         dg = models.LdapDeviceGroup(
-            name=group.name,
-            group_dn=group.dn,
+            name=self.group.name,
+            group_dn=self.group.dn,
         )
         dg.init()
         dg = models.LdapDeviceGroup.objects.get()

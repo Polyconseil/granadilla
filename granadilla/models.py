@@ -31,6 +31,7 @@ except ImportError:
 import logging
 import os
 import time
+import random
 import unicodedata
 
 from .conf import settings
@@ -52,6 +53,11 @@ def hash_password(password):
     m = md5_constructor()
     m.update(password.encode('utf-8'))
     return "{MD5}" + base64.b64encode(m.digest())
+
+
+def random_password(length=32):
+    allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 
 class LdapAcl(ldap_models.Model):
@@ -319,7 +325,9 @@ class LdapDevice(ldap_models.Model):
     def check_password(self, password):
         return self.password == hash_password(password)
 
-    def set_password(self, password):
+    def set_password(self, password=''):
+        if not password:
+            password = random_password()
         self.password = hash_password(password)
 
     def save(self, *args, **kwargs):
