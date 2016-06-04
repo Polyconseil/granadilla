@@ -244,7 +244,7 @@ class LdapUser(ldap_models.Model):
         if settings.GRANADILLA_USE_SAMBA and not self.samba_sid:
             self.samba_sid = "%s-%i" % (settings.GRANADILLA_SAMBA_PREFIX, self.uid * 2 + 1000)
         super(LdapUser, self).save(*args, **kwargs)
-        
+
     class Meta:
         ordering = ('last_name', 'first_name')
         verbose_name = _("user")
@@ -302,19 +302,19 @@ class LdapDevice(ldap_models.Model):
     object_classes = ['device', 'simpleSecurityObject']
 
     # device
-    device_fullname = ldap_fields.CharField(_("device fullname"), db_column='cn', primary_key=True)
-    device_name = ldap_fields.CharField(_("device name"), db_column='description')
-    device_owner = ldap_fields.CharField(_("device owner"), db_column='owner')
-    device_username = ldap_fields.CharField(_("device username"), db_column='o')
+    login = ldap_fields.CharField(_("device-specific login"), db_column='cn', primary_key=True)
+    name = ldap_fields.CharField(_("name"), db_column='description')
+    owner_dn = ldap_fields.CharField(_("owner distinguished name"), db_column='owner')
+    owner_username = ldap_fields.CharField(_("owner username"), db_column='o')
 
-    # simpleSecurityObject   
+    # simpleSecurityObject
     password = ldap_fields.CharField(_("password"), db_column='userPassword')
- 
+
     def __str__(self):
-        return self.device_username
+        return self.owner_username
 
     def __unicode__(self):
-        return self.device_name
+        return self.name
 
     def check_password(self, password):
         return self.password == hash_password(password)
@@ -366,7 +366,7 @@ class LdapDeviceGroup(ldap_models.Model):
     def _get_expected_members(self):
         owners = self.group.get_members()
         owner_dns = [owner.dn for owner in owners]
-        devices = LdapDevice.objects.filter(device_owner__in=owner_dns)
+        devices = LdapDevice.objects.filter(owner_dn__in=owner_dns)
         return [device.dn for device in devices]
 
     def init(self, save=True):

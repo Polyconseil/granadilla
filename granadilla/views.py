@@ -128,12 +128,12 @@ class DevicePassword(generic_views.DetailView):
 
     def get_object(self, queryset=None):
         try:
-            device = get_devices().objects.get(device_fullname=self.kwargs['device_fullname'])
+            device = get_devices().objects.get(login=self.kwargs['device_login'])
         except models.LdapDevice.DoesNotExist:
             return None
 
         user = self.request.user
-        if user.username == device.device_username:
+        if user.username == device.owner_username:
             # Change the password and display it using tmppwd 
             device.tmppwd = get_random_password()
             device.set_password(device.tmppwd)
@@ -155,16 +155,16 @@ class DeviceDelete(generic_views.DeleteView):
     model = models.LdapDevice
     template_name = 'granadilla/device_delete.html'
 
-    slug_field = 'device_fullname'
+    slug_field = 'device_login'
 
     def get_object(self, queryset=None):
         try:
-            device = get_devices().objects.get(device_fullname=self.kwargs['device_fullname'])
+            device = get_devices().objects.get(login=self.kwargs['device_login'])
         except models.LdapDevice.DoesNotExist:
             return None
 
         user = self.request.user
-        if user.is_superuser or user.username == device.device_username:
+        if user.is_superuser or user.username == device.owner_username:
             return device
         else:
             return None
@@ -187,12 +187,11 @@ class DeviceAttrView(generic_views.ListView):
         user = self.request.user
 
         try:
-            device = get_devices().objects.get(device_fullname=\
-                    self.kwargs['device_fullname'])
+            device = get_devices().objects.get(login=self.kwargs['device_login'])
         except models.LdapDevice.DoesNotExist:
             return None
 
-        if user.is_superuser or user.username == device.device_username:
+        if user.is_superuser or user.username == device.owner_username:
             return [device]
         else:
             return None
@@ -212,7 +211,7 @@ class DeviceListView(generic_views.ListView):
         if user.is_superuser:
             return get_devices().objects.all()
         else:
-            return get_devices().objects.filter(device_username=user.username)
+            return get_devices().objects.filter(owner_username=user.username)
 
 
 device_list = login_required(DeviceListView.as_view())

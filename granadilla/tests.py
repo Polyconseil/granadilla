@@ -54,10 +54,10 @@ class DeviceTests(LdapBasedTestCase):
         group.save()
 
         device = models.LdapDevice(
-            device_owner=user.dn,
-            device_name="My shiny laptop",
-            device_username='laptop',
-            device_fullname='jdoe_laptop',
+            owner_dn=user.dn,
+            name="My shiny laptop",
+            owner_username='laptop',
+            login='jdoe_laptop',
         )
         device.set_password('sesame')
         device.save()
@@ -69,10 +69,10 @@ class DeviceTests(LdapBasedTestCase):
         device_group.save()
 
         device2 = models.LdapDevice(
-            device_owner=user.dn,
-            device_name="My awesome smartphone",
-            device_username='smartphone',
-            device_fullname='jdoe_smartphone',
+            owner_dn=user.dn,
+            name="My awesome smartphone",
+            owner_username='smartphone',
+            login='jdoe_smartphone',
         )
         device2.set_password('sesame!!')
         device2.save()
@@ -108,18 +108,18 @@ class DeviceTests(LdapBasedTestCase):
         response = self.client.post(
             reverse('device_create'),
             {
-                'device_name': 'laptop',
+                'name': 'laptop',
             },
         )
         self.assertEqual(302, response.status_code)
         response = self.client.get(response.url)
         self.assertEqual(200, response.status_code)
         device = models.LdapDevice.objects.get()
-        self.assertEqual('jdoe_laptop', device.device_fullname)
+        self.assertEqual('jdoe_laptop', device.login)
 
         # Create device password
         response = self.client.get(
-            reverse('device_password', args=(device.device_fullname,)),
+            reverse('device_password', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
         pwd = response.context['object'].tmppwd
@@ -138,14 +138,14 @@ class DeviceTests(LdapBasedTestCase):
         response = self.client.post(
             reverse('device_create'),
             {
-                'device_name': 'phone',
+                'name': 'phone',
             },
             follow=True,
         )
         self.assertEqual(200, response.status_code)
         self.assertEqual(2, models.LdapDevice.objects.count())
         device2 = models.LdapDevice.objects.all()[1]
-        self.assertEqual('jdoe_phone', device2.device_fullname)
+        self.assertEqual('jdoe_phone', device2.login)
 
         # Group should contain both devices.
         dg = models.LdapDeviceGroup.objects.all()[0]

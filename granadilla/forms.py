@@ -43,10 +43,9 @@ class LdapDeviceForm(forms.ModelForm):
     def is_valid(self):
         if super(LdapDeviceForm, self).is_valid():    
             # Check if the device already exists
-            device_fullname = self._username + '_' + \
-                        self.data['device_name']
+            login = self._username + '_' + self.data['name']
             try:
-                if models.LdapDevice.objects.get(device_fullname=device_fullname):
+                if models.LdapDevice.objects.get(login=login):
                     self.errors['devicenameerror'] = "A device with \
                             this name already exists"
                     return False
@@ -57,11 +56,10 @@ class LdapDeviceForm(forms.ModelForm):
     def save(self, commit=True):
         device = super(LdapDeviceForm, self).save(False)
 
-        device.device_username = self._username
-        user = models.LdapUser.objects.get(username=device.device_username)
-        device.device_owner = user.dn
-        device.device_fullname = device.device_username \
-                         + '_' + self.data['device_name']
+        device.owner_username = self._username
+        user = models.LdapUser.objects.get(username=device.owner_username)
+        device.owner_dn = user.dn
+        device.login = device.owner_username + '_' + self.data['name']
 
         # Initialize with random password because the field is necessary
         device.set_password(self.tmppwd)
@@ -75,7 +73,7 @@ class LdapDeviceForm(forms.ModelForm):
 
     class Meta:
         model = models.LdapDevice
-        exclude = ("password", "dn", "device_username", "device_owner", "device_fullname")
+        exclude = ("password", "dn", "owner_username", "owner_dn", "login")
 
 
 class LdapUserForm(forms.ModelForm):

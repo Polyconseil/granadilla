@@ -113,8 +113,8 @@ class CLI(object):
         password = None
 
         blacklist = [
-            device.device_owner,
-            device.device_name,
+            device.owner_dn,
+            device.name,
         ]
 
         while password is None:
@@ -587,31 +587,31 @@ class CLI(object):
         """
         Print the list of devices and their owner.
         """
-        for device in models.LdapDevice.objects.order_by('device_fullname'):
-            self.display("%s", device.device_fullname)
+        for device in models.LdapDevice.objects.order_by('login'):
+            self.display("%s", device.login)
 
     @command
-    def device_add(self, username):
+    def device_add(self, username, device_name):
         """
         Add a new device.
         """
         device = models.LdapDevice()
         user = models.LdapUser.objects.get(username=username)
-        device.device_username = username
-        device.device_owner = user.dn
-        device.device_name = self.grab("Device name: ", False) 
-        device.device_fullname = username + "_" + device.device_name
+        device.owner_username = username
+        device.owner_dn = user.dn
+        device.name = device_name
+        device.login = username + "_" + device_name
         self.change_device_password(device)
         device.save()
         self.sync_device_acls()
 
     @command
-    def device_password(self, username, device_name):
+    def device_password(self, username, name):
         """
         Change the password of the device.
         """
         device = models.LdapDevice.objects.get(
-                    device_fullname=username + "_" + device_name)
+                    login=username + "_" + name)
         self.change_device_password(device)
         device.save()
 
@@ -621,8 +621,8 @@ class CLI(object):
         Delete a device.
         """
         device = models.LdapDevice.objects.get(
-                        device_fullname=username + "_" + device_name)
-        self.warn("Deleting device %s", device_name)
+                        login=username + "_" + device_name)
+        self.warn("Deleting device %s", device.login)
         device.delete()
 
     @command

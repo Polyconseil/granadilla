@@ -67,7 +67,7 @@ admin.site.register(models.LdapServiceAccount, LdapServiceAccountAdmin)
 
 class LdapDeviceAdmin(admin.ModelAdmin):
     exclude = ['dn']
-    list_display = ['device_fullname', 'device_name', 'device_owner']
+    list_display = ['login', 'name', 'owner_dn']
     search_fields = list_display
 
 admin.site.register(models.LdapDevice, LdapDeviceAdmin)
