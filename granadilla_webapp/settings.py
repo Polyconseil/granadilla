@@ -89,8 +89,16 @@ DATABASES = {
         'PORT': config.get('db.port'),
         'USER': config.get('db.user'),
         'PASSWORD': config.get('db.password'),
-    }
+    },
+    'ldap': {
+        'ENGINE': 'ldapdb.backends.ldap',
+        'NAME': config.get('ldap.server', 'ldaps://ldaps.example.org'),
+        'USER': config.get('ldap.webapp_bind_dn', 'uid=test,dc=example,dc=org'),
+        'PASSWORD': config.get('ldap.webapp_bind_pw'),
+    },
 }
+
+DATABASE_ROUTERS = ['ldapdb.router.Router']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -114,9 +122,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # LDAP
-LDAPDB_BIND_DN = config.get('ldap.webapp_bind_dn', 'uid=test,dc=example,dc=org')
-LDAPDB_BIND_PASSWORD = config.get('ldap.webapp_bind_pw')
-LDAPDB_SERVER_URI = config.get('ldap.server', 'ldaps://ldaps.example.org')
 
 # Base DN for LDAP database.
 GRANADILLA_BASE_DN = config.get('granadilla.base_dn', 'dc=example,dc=org')
@@ -161,6 +166,6 @@ GRANADILLA_SAMBA_PREFIX = config.get('granadilla.samba_prefix', 'S-1-0-0')
 GRANADILLA_MEDIA_PREFIX = os.path.join(STATIC_URL, 'granadilla')
 
 
-PAPAYA_LDAP_SERVER_URI = LDAPDB_SERVER_URI
+PAPAYA_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
 PAPAYA_LDAP_GROUPS_DN = GRANADILLA_GROUPS_DN
 PAPAYA_LDAP_USERS_DN = GRANADILLA_USERS_DN
