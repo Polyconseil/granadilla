@@ -132,8 +132,7 @@ class DevicePassword(DeviceACLMixin, generic_views.DetailView):
     def post(self, request, *args, **kwargs):
         # Set self.object, expected by Django
         device = self.object = self.get_object()
-        password = models.random_password()
-        device.set_password(password)
+        password = device.set_password()
         device.save()
 
         context = self.get_context_data(object=device)

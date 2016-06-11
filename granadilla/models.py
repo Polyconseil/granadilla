@@ -323,12 +323,14 @@ class LdapDevice(ldap_models.Model):
         return self.name
 
     def check_password(self, password):
-        return self.password == hash_password(password)
+        return self.password == password
 
-    def set_password(self, password=''):
-        if not password:
-            password = random_password()
-        self.password = hash_password(password)
+    def set_password(self):
+        # We use a clear-text password:
+        # - it is machine generated
+        # - this is required for PAP/EAP/... protocols
+        self.password = random_password()
+        return self.password
 
     def save(self, *args, **kwargs):
         res = super(LdapDevice, self).save(*args, **kwargs)

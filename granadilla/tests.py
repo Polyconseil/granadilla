@@ -65,7 +65,7 @@ class DeviceTests(LdapBasedTestCase):
             owner_username='laptop',
             login='jdoe_laptop',
         )
-        device.set_password('sesame')
+        device.set_password()
         device.save()
         device_group = models.LdapDeviceGroup(
             name=self.group.name,
@@ -80,7 +80,7 @@ class DeviceTests(LdapBasedTestCase):
             owner_username='jdoe',
             login='jdoe_smartphone',
         )
-        device2.set_password('sesame!!')
+        device2.set_password()
         device2.save()
 
         dg = models.LdapDeviceGroup.objects.get()
@@ -93,7 +93,7 @@ class DeviceTests(LdapBasedTestCase):
             owner_username='jdoe',
             login='jdoe_laptop',
         )
-        device.set_password('sesame')
+        device.set_password()
         device.save()
 
         self.client.login(username='jdoe', password='yay')
@@ -112,7 +112,7 @@ class DeviceTests(LdapBasedTestCase):
             owner_username='jdoe',
             login='jdoe_laptop',
         )
-        device.set_password('sesame')
+        device.set_password()
         device.save()
 
         self.client.login(username='jdoe', password='yay')

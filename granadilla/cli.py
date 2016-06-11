@@ -109,19 +109,6 @@ class CLI(object):
 
         user.set_password(password)
 
-    def change_device_password(self, device):
-        password = None
-
-        blacklist = [
-            device.owner_dn,
-            device.name,
-        ]
-
-        while password is None:
-            password = self._get_good_password(blacklist)
-
-        device.set_password(password)
-
     def _get_good_password(self, blacklist):
         password1 = self.grab("Password: ", True)
         password2 = self.grab("Password (again): ", True)
@@ -601,7 +588,8 @@ class CLI(object):
         device.owner_dn = user.dn
         device.name = device_name
         device.login = username + "_" + device_name
-        self.change_device_password(device)
+        password = device.set_password()
+        self.display("Generated password: %s", password)
         device.save()
         self.sync_device_acls()
 
@@ -612,7 +600,8 @@ class CLI(object):
         """
         device = models.LdapDevice.objects.get(
                     login=username + "_" + name)
-        self.change_device_password(device)
+        password = device.set_password()
+        self.display("Generated password: %s", password)
         device.save()
 
     @command
