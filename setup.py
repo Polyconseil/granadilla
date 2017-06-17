@@ -23,7 +23,7 @@ setup(
     long_description=read('README.rst'),
     install_requires=[
         # Django core
-        'Django>=1.7,<1.8',
+        'Django>=1.11,<2.0',
 
         # Databases
         'django-ldapdb>=0.6.0',
@@ -43,10 +43,13 @@ setup(
         "Development Status :: 4 - Beta",
         "Environment :: Web Environment",
         "Environment :: Console",
-        "Framework :: Django",
+        "Framework :: Django :: 1.11",
         "Intended Audience :: System Administrators",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: System :: Systems Administration :: Authentication/Directory :: LDAP",
     ],
     include_package_data=True,
