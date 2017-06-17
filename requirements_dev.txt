@@ -1,6 +1,6 @@
 -e .
 
-papaya
+papaya>=0.3.0
 volatildap
 
 # For tests

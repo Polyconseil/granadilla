@@ -18,15 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from __future__ import unicode_literals
-
 import base64
-try:
-    import hashlib
-    md5_constructor = hashlib.md5
-except ImportError:
-    import md5
-    md5_constructor = md5.new
+import hashlib
+md5_constructor = hashlib.md5
 
 import logging
 import os
@@ -44,15 +38,15 @@ from ldapdb.models import fields as ldap_fields
 logger = logging.getLogger(__name__.split('.')[0])
 
 
-def normalise(str):
-    nkfd_form = unicodedata.normalize('NFKD', unicode(str))
+def normalise(text):
+    nkfd_form = unicodedata.normalize('NFKD', text)
     return u"".join([c for c in nkfd_form if not unicodedata.combining(c)])
 
 
 def hash_password(password):
     m = md5_constructor()
     m.update(password.encode('utf-8'))
-    return "{MD5}" + base64.b64encode(m.digest())
+    return "{MD5}" + base64.b64encode(m.digest()).decode('ascii')
 
 
 def random_password(length=32):
@@ -78,7 +72,7 @@ class LdapAcl(ldap_models.Model):
         else:
             super(LdapAcl, self).save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -101,9 +95,6 @@ class LdapGroup(ldap_models.Model):
     usernames = ldap_fields.ListField(_("usernames"), db_column='memberUid')
 
     def __str__(self):
-        return self.name
-
-    def __unicode__(self):
         return self.name
 
     class Meta:
@@ -144,9 +135,6 @@ class LdapServiceAccount(ldap_models.Model):
         verbose_name_plural = _("service accounts")
 
     def __str__(self):
-        return self.username
-
-    def __unicode__(self):
         return self.username
 
     def set_password(self, password):
@@ -227,9 +215,6 @@ class LdapUser(ldap_models.Model):
     def __str__(self):
         return self.username
 
-    def __unicode__(self):
-        return self.full_name
-
     def set_password(self, password):
         self.password = hash_password(password)
         if settings.GRANADILLA_USE_SAMBA:
@@ -286,9 +271,6 @@ class LdapExternalUser(ldap_models.Model):
     def __str__(self):
         return self.username
 
-    def __unicode__(self):
-        return self.full_name
-
     class Meta:
         ordering = ('last_name', 'first_name')
         verbose_name = _("external user")
@@ -318,9 +300,6 @@ class LdapDevice(ldap_models.Model):
 
     def __str__(self):
         return self.owner_username
-
-    def __unicode__(self):
-        return self.name
 
     def check_password(self, password):
         return self.password == password
@@ -352,9 +331,6 @@ class LdapDeviceGroup(ldap_models.Model):
     members = ldap_fields.ListField(_("members"), db_column='member')
 
     def __str__(self):
-        return self.name
-
-    def __unicode__(self):
         return self.name
 
     class Meta:
