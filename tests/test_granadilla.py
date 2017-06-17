@@ -7,8 +7,8 @@ from django import test as django_test
 
 import volatildap
 
-from . import cli
-from . import models
+from granadilla import cli
+from granadilla import models
 
 
 class LdapBasedTestCase(django_test.TestCase):
