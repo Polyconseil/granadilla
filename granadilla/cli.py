@@ -116,17 +116,17 @@ class CLI(object):
             self.error("Passwords do not match, try again.")
             return None
 
-        check = zxcvbn.password_strength(password1, blacklist)
+        check = zxcvbn.zxcvbn(password1, user_inputs=blacklist)
         if check['score'] < self.PASSWORD_MIN_SCORE:
             self.error("Password is too weak (bruteforce: %s)", check['crack_time_display'])
             return None
 
-        self.success("Password is strong enough (bruteforce: %s)", check['crack_time_display'])
+        self.success("Password is strong enough (bruteforce: %s)", check['crack_times_display']['offline_slow_hashing_1e4_per_second'])
         return password1
 
     def grab(self, prompt, password=False):
 
-        if password:
+        if password and sys.stdin.isatty():
             fd = sys.stdin.fileno()
             old = termios.tcgetattr(fd)
             new = termios.tcgetattr(fd)

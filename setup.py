@@ -34,7 +34,7 @@ setup(
 
         # Passwords
         'smbpasswd',
-        'zxcvbn',
+        'zxcvbn-python',
 
         # Command line
         'colorama',

@@ -1,5 +1,9 @@
 from __future__ import unicode_literals
 
+import contextlib
+import io
+import sys
+
 from django.conf import settings
 from django.contrib.auth import models as auth_models
 from django.urls import reverse
@@ -9,6 +13,19 @@ import volatildap
 
 from granadilla import cli
 from granadilla import models
+
+
+# Helpers
+# =======
+
+
+@contextlib.contextmanager
+def replace_stdin(contents):
+    original_stdin = sys.stdin
+    fake_stdin = io.StringIO(contents)
+    sys.stdin = fake_stdin
+    yield fake_stdin
+    sys.stdin = original_stdin
 
 
 class LdapBasedTestCase(django_test.TestCase):
@@ -32,6 +49,10 @@ class LdapBasedTestCase(django_test.TestCase):
         settings.DATABASES['ldap']['NAME'] = self.ldap_server.uri
         settings.PAPAYA_LDAP_SERVER_URI = self.ldap_server.uri
         cli.CLI().init()
+
+
+# Tests
+# =====
 
 
 class DeviceTests(LdapBasedTestCase):
@@ -267,3 +288,18 @@ class DeviceTests(LdapBasedTestCase):
         # Group should contain both devices.
         dg = models.LdapDeviceGroup.objects.all()[0]
         self.assertEqual([device.dn, device2.dn], dg.members)
+
+
+class UserTests(LdapBasedTestCase):
+    def test_cli_adduser(self):
+        lines = [
+            'John',
+            'Doe',
+            '',
+            'this password is amazing!',
+            'this password is amazing!',
+        ]
+
+        interface = cli.CLI()
+        with replace_stdin('\n'.join(lines)) as stdin:
+            interface.adduser('jdoe')
