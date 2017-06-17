@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # django-granadilla
 # Copyright (C) 2009-2012 Bolloré telecom
 # See AUTHORS file for a full list of contributors.
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -35,20 +35,12 @@ import sys
 
 import zxcvbn
 
-if django.VERSION[:2] >= (1, 7):
-    django.setup()
 
-from .conf import settings
-from . import models
+django.setup()
 
-PY2 = sys.version_info[0] == 2
+from .conf import settings  # noqa: E402
+from . import models  # noqa: E402
 
-if PY2:
-    def force_text(txt):
-        return txt.decode('utf-8')
-else:
-    def force_text(txt):
-        return txt
 
 # configure logging
 logger = logging.getLogger(__name__.split('.')[0])
@@ -78,10 +70,7 @@ class CLI(object):
     def _write(self, txt, args, color=colorama.Fore.RESET, target=sys.stdout):
         txt = txt % args
         txt = '%s%s%s\n' % (color, txt, colorama.Fore.RESET)
-        if PY2:
-            target.write(txt.encode('utf-8'))
-        else:
-            target.write(txt)
+        target.write(txt)
 
     def display(self, txt, *args):
         self._write(txt, args)
@@ -121,7 +110,10 @@ class CLI(object):
             self.error("Password is too weak (bruteforce: %s)", check['crack_time_display'])
             return None
 
-        self.success("Password is strong enough (bruteforce: %s)", check['crack_times_display']['offline_slow_hashing_1e4_per_second'])
+        self.success(
+            "Password is strong enough (bruteforce: %s)",
+            check['crack_times_display']['offline_slow_hashing_1e4_per_second'],
+        )
         return password1
 
     def grab(self, prompt, password=False):
@@ -133,7 +125,7 @@ class CLI(object):
             new[3] = new[3] & ~termios.ECHO
             try:
                 termios.tcsetattr(fd, termios.TCSADRAIN, new)
-                passwd = force_text(raw_input(prompt))
+                passwd = input(prompt)
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old)
             sys.stdout.write("\n")
@@ -141,11 +133,10 @@ class CLI(object):
 
         else:
             sys.stdout.write(prompt)
-            return force_text(sys.stdin.readline()).strip()
+            return sys.stdin.readline().strip()
 
     def fill_object(self, obj, fields):
         for key in fields:
-            field = obj._meta.get_field(key)
             name = key.replace("_", " ").title()
             default = getattr(obj, key)
             new_value = ''
@@ -185,7 +176,7 @@ class CLI(object):
         # create user
         users = models.LdapUser.objects.all()
         if users:
-            id = max([ x.uid for x in users ]) + 1
+            id = max([x.uid for x in users]) + 1
         else:
             id = 10000
 
@@ -207,20 +198,20 @@ class CLI(object):
         """Add user <username> to group <groupname>."""
         user = models.LdapUser.objects.get(username=username)
         group = models.LdapGroup.objects.get(name=groupname)
-        if not user.username in group.usernames:
+        if user.username not in group.usernames:
             group.usernames.append(user.username)
             group.save()
 
         if settings.GRANADILLA_USE_ACLS:
             try:
                 acl = models.LdapAcl.objects.get(name=groupname)
-                if not user.dn in acl.members:
+                if user.dn not in acl.members:
                     acl.members.append(user.dn)
                     acl.save()
             except models.LdapAcl.DoesNotExist:
                 acl = models.LdapAcl()
                 acl.name = groupname
-                acl.members = [ user.dn ]
+                acl.members = [user.dn]
                 acl.save()
 
     @command
@@ -275,18 +266,17 @@ class CLI(object):
     def _delusergroup(self, user, group):
         if user.username in group.usernames:
             self.warn("Removing %s from group %s", user.username, group.name)
-            group.usernames = [ x for x in group.usernames if x != user.username ]
+            group.usernames = [x for x in group.usernames if x != user.username]
             group.save()
 
         if settings.GRANADILLA_USE_ACLS:
             try:
                 acl = models.LdapAcl.objects.get(name=group.name)
                 if user.dn in acl.members:
-                    acl.members = [ x for x in acl.members if x != user.dn ]
+                    acl.members = [x for x in acl.members if x != user.dn]
                     acl.save()
             except models.LdapAcl.DoesNotExist:
                 pass
-
 
     @command
     def deluser(self, username):
@@ -346,10 +336,16 @@ class CLI(object):
         Print the members of one group
         """
         members = models.LdapGroup.objects.get(name=groupname).usernames
-        others = [ x.username for x in models.LdapUser.objects.all() if not x.username in members ]
+        others = [
+            x.username
+            for x in models.LdapUser.objects.all()
+            if x.username not in members
+        ]
+
         self.display("members:")
         for member in sorted(members):
             self.display("  %s", member)
+
         self.display("")
         self.display("non-members:")
         for other in sorted(others):
@@ -502,7 +498,8 @@ class CLI(object):
         Add an extuser in a group.
         """
         account = models.LdapExternalUser.objects.get(email=email)
-        group = models.LdapGroup.objects.get(name=groupname)
+        # Ensure the group exists
+        models.LdapGroup.objects.get(name=groupname)
 
         if settings.GRANADILLA_USE_ACLS:
             try:
@@ -544,7 +541,7 @@ class CLI(object):
                 return
 
             if account.dn in acl.members:
-                acl.members = [ dn for dn in acl.members if dn != account.dn ]
+                acl.members = [dn for dn in acl.members if dn != account.dn]
                 acl.save()
 
     @command
@@ -598,8 +595,7 @@ class CLI(object):
         """
         Change the password of the device.
         """
-        device = models.LdapDevice.objects.get(
-                    login=username + "_" + name)
+        device = models.LdapDevice.objects.get(login=username + "_" + name)
         password = device.set_password()
         self.display("Generated password: %s", password)
         device.save()
@@ -609,8 +605,7 @@ class CLI(object):
         """
         Delete a device.
         """
-        device = models.LdapDevice.objects.get(
-                        login=username + "_" + device_name)
+        device = models.LdapDevice.objects.get(login=username + "_" + device_name)
         self.warn("Deleting device %s", device.login)
         device.delete()
 
@@ -647,7 +642,7 @@ class CLI(object):
                 continue
 
             bits = [cmd]
-            bits.extend(["<%s>" % arg for arg in inspect.getargspec(func)[0][1:] ])
+            bits.extend(["<%s>" % arg for arg in inspect.getargspec(func)[0][1:]])
             cmdhelp.append("%s%s" % (" ".join(bits).ljust(50), func.__doc__.strip()))
 
         self.display("""Usage: %s <command> [arguments..]
@@ -655,7 +650,6 @@ class CLI(object):
 Commands:
 %s
 """, os.path.basename(sys.argv[0]), "\n".join(cmdhelp))
-
 
     def main(self, argv):
         if len(argv) < 2:  # No command
@@ -669,8 +663,6 @@ Commands:
             self.error("Unknown command %s", cmd)
             self.help()
             return 1
-
-        args = [force_text(arg) for arg in args]
 
         try:
             meth(*args)

@@ -1,26 +1,25 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # django-granadilla
 # Copyright (C) 2009-2012 Bolloré telecom
 # See AUTHORS file for a full list of contributors.
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
 import base64
 import hashlib
-md5_constructor = hashlib.md5
 
 import logging
 import os
@@ -44,13 +43,13 @@ def normalise(text):
 
 
 def hash_password(password):
-    m = md5_constructor()
+    m = hashlib.md5()
     m.update(password.encode('utf-8'))
     return "{MD5}" + base64.b64encode(m.digest()).decode('ascii')
 
 
 def random_password(length=32):
-    allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 
@@ -178,9 +177,13 @@ class LdapUser(ldap_models.Model):
     # posixAccount
     uid = ldap_fields.IntegerField(_("user id"), db_column='uidNumber', unique=True)
     group = ldap_fields.IntegerField(_("group id"), db_column='gidNumber')
-    gecos =  ldap_fields.CharField(db_column='gecos')
+    gecos = ldap_fields.CharField(db_column='gecos')
     home_directory = ldap_fields.CharField(_("home directory"), db_column='homeDirectory')
-    login_shell = ldap_fields.CharField(_("login shell"), db_column='loginShell', default=settings.GRANADILLA_USERS_SHELL)
+    login_shell = ldap_fields.CharField(
+        _("login shell"),
+        db_column='loginShell',
+        default=settings.GRANADILLA_USERS_SHELL,
+    )
     username = ldap_fields.CharField(_("username"), db_column='uid', primary_key=True)
     password = ldap_fields.CharField(_("password"), db_column='userPassword')
 

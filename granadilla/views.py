@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
-# 
+#
 # django-granadilla
 # Copyright (C) 2009-2012 Bolloré telecom
 # See AUTHORS file for a full list of contributors.
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
@@ -26,8 +26,8 @@ from .conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
-from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotModified
-from django.shortcuts import get_object_or_404, render_to_response
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotModified
+from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext
 from django.utils.http import http_date
 from django.views.static import was_modified_since
@@ -38,6 +38,7 @@ from granadilla.forms import LdapDeviceForm, LdapUserForm
 from . import models
 from . import vcard
 
+
 def can_write(user, entry):
     """
     Check whether a user can write an LDAP entry.
@@ -47,6 +48,7 @@ def can_write(user, entry):
         if group.name in settings.GRANADILLA_ADMIN_GROUPS:
             return True
     return can_edit
+
 
 def get_contacts(user):
     base_dn = "ou=%s,%s" % (user.username, settings.GRANADILLA_CONTACTS_DN)
@@ -74,7 +76,8 @@ def user_vcard(user):
     response = HttpResponse(card.render_bytes(), "text/x-vcard; charset=utf-8")
     response['Content-Disposition'] = "attachment; filename=%s.vcf" % user.pk.replace(' ', '')
     return response
-    
+
+
 @login_required
 def index(request, template_name='granadilla/facebook.html'):
     return group(request, pk=settings.GRANADILLA_USERS_GROUP)
@@ -113,6 +116,7 @@ class DeviceCreate(generic_views.CreateView):
     def get_success_url(self):
         return reverse('granadilla:device_list')
 
+
 device_create = login_required(DeviceCreate.as_view())
 
 
@@ -138,6 +142,7 @@ class DevicePassword(DeviceACLMixin, generic_views.DetailView):
         context = self.get_context_data(object=device)
         context['password'] = password
         return self.render_to_response(context)
+
 
 device_password = login_required(DevicePassword.as_view())
 
@@ -170,6 +175,7 @@ class DeviceAttrView(DeviceACLMixin, generic_views.DetailView):
     slug_url_kwarg = 'device_login'
     context_object_name = 'device'
 
+
 device_attr = login_required(DeviceAttrView.as_view())
 
 
@@ -180,6 +186,7 @@ class DeviceListView(DeviceACLMixin, generic_views.ListView):
     model = models.LdapDevice
     template_name = 'granadilla/device_list.html'
     context_object_name = 'devices'
+
 
 device_list = login_required(DeviceListView.as_view())
 
@@ -204,14 +211,13 @@ class GroupView(generic_views.DetailView):
 group = login_required(GroupView.as_view())
 
 
-
 class PrintableGroupView(GroupView):
+    """
+    Display a printable list of users belonging to a group.
+    """
     printable = True
 
 
-"""
-Display a printable list of users belonging to a group.
-"""
 group_print = login_required(PrintableGroupView.as_view())
 
 
@@ -244,6 +250,7 @@ def photo(request, uid):
     response.write(user.photo)
     return response
 
+
 def photo_delete(request, uid):
     user = get_object_or_404(models.LdapUser, pk=uid)
     if not can_write(request.user, user):
@@ -252,11 +259,12 @@ def photo_delete(request, uid):
     if request.method == 'POST':
         user.photo = ''
         user.save()
-        return redirect_to(request, reverse(index))
+        return redirect(reverse(index))
     else:
         return render_to_response('granadilla/photo_delete.html', RequestContext(request, {
             'object': user,
         }))
+
 
 @login_required
 def user(request, uid):
@@ -272,7 +280,7 @@ def user(request, uid):
         form = LdapUserForm(request.POST, request.FILES, instance=user)
         if form.is_valid():
             form.save()
-            return redirect_to(request, reverse(index))
+            return redirect(reverse(index))
     else:
         form = LdapUserForm(instance=user)
 
@@ -282,8 +290,8 @@ def user(request, uid):
         'form': form,
     }))
 
+
 @login_required
 def user_card(request, uid):
     user = get_object_or_404(models.LdapUser, pk=uid)
     return user_vcard(user)
- 

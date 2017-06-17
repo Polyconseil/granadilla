@@ -301,5 +301,5 @@ class UserTests(LdapBasedTestCase):
         ]
 
         interface = cli.CLI()
-        with replace_stdin('\n'.join(lines)) as stdin:
+        with replace_stdin('\n'.join(lines)):
             interface.adduser('jdoe')
