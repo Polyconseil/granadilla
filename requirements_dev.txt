@@ -2,3 +2,7 @@
 
 papaya
 volatildap
+
+# For tests
+check_manifest
+flake8
