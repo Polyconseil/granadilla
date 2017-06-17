@@ -1,6 +1,25 @@
 granadilla
 ==========
 
+.. image:: https://secure.travis-ci.org/Polyconseil/granadilla.png?branch=master
+    :target: http://travis-ci.org/Polyconseil/granadilla/
+
+.. image:: https://img.shields.io/pypi/v/granadilla.svg
+    :target: https://pypi.python.org/pypi/granadilla/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/pyversions/granadilla.svg
+    :target: https://pypi.python.org/pypi/granadilla/
+    :alt: Supported Python versions
+
+.. image:: https://img.shields.io/pypi/wheel/granadilla.svg
+    :target: https://pypi.python.org/pypi/granadilla/
+    :alt: Wheel status
+
+.. image:: https://img.shields.io/pypi/l/granadilla.svg
+    :target: https://pypi.python.org/pypi/granadilla/
+    :alt: License
+
 This django-backed software provides a simple administration tool for a minimal LDAP directory:
 
 * Web application providing a clean, editable phonebook (including pictures)
