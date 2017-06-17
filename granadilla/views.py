@@ -25,7 +25,7 @@ import time
 from .conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse, Http404, HttpResponseRedirect, HttpResponseNotModified
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
@@ -111,7 +111,7 @@ class DeviceCreate(generic_views.CreateView):
         return kwargs
 
     def get_success_url(self):
-        return reverse(device_list)
+        return reverse('granadilla:device_list')
 
 device_create = login_required(DeviceCreate.as_view())
 
@@ -153,7 +153,7 @@ class DeviceDelete(DeviceACLMixin, generic_views.DeleteView):
     slug_url_kwarg = 'device_login'
 
     def get_success_url(self):
-        return reverse(device_list)
+        return reverse('granadilla:device_list')
 
 
 device_delete = login_required(DeviceDelete.as_view())

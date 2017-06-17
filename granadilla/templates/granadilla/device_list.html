@@ -5,13 +5,13 @@
 {% block subtitle %}{% trans "Devices" %}{% endblock %}
 
 {% block breadcrumbs %}
-<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Devices" %}
+<a href="{% url "granadilla:index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Devices" %}
 {% endblock %}
 
 {% block content %}
 <h2>{% trans "Devices" %}</h2>
 
-<a href="{% url "granadilla.views.device_create" %}">{% trans "Add a device" %}</a>
+<a href="{% url "granadilla:device_create" %}">{% trans "Add a device" %}</a>
 
 {% if object_list %}
 
@@ -26,7 +26,7 @@
     {% for device in devices %}
     <tr>
       <td>{{ device.owner_username }}</td>
-      <td><a href="{% url "device_details" device.login %}">{{ device.login }}</a></td>
+      <td><a href="{% url "granadilla:device_details" device.login %}">{{ device.login }}</a></td>
     </tr>
     {% endfor %}
   </tbody>

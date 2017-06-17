@@ -14,9 +14,9 @@
 <div class="module">
 <h2>{% granadilla_title %}</h2>
 <ul>
-  <li class="phonebook-user"><a href="{% url "granadilla.views.index" %}">{% trans "Users" %}</a></li>
-  <li class="phonebook-group"><a href="{% url "granadilla.views.groups" %}">{% trans "Groups" %}</a></li>
-  <li class="phonebook-device"><a href="{% url "granadilla.views.device_list" %}">{% trans "Devices" %}</a></li>
+  <li class="phonebook-user"><a href="{% url "granadilla:index" %}">{% trans "Users" %}</a></li>
+  <li class="phonebook-group"><a href="{% url "granadilla:groups" %}">{% trans "Groups" %}</a></li>
+  <li class="phonebook-device"><a href="{% url "granadilla:device_list" %}">{% trans "Devices" %}</a></li>
 {% block links %}{% endblock %}
 </ul>
 </div>

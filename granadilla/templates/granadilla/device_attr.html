@@ -5,7 +5,7 @@
 {% block subtitle %}{% trans "Devices" %}{% endblock %}
 
 {% block breadcrumbs %}
-<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Devices" %}
+<a href="{% url "granadilla:index" %}">{% granadilla_title %}</a> &rsaquo; {% trans "Devices" %}
 {% endblock %}
 
 {% block content %}
@@ -27,7 +27,7 @@
     </tr>
     <tr>
       <th>{% trans "Password" %}</th>
-      <td><a href="{% url "granadilla.views.device_password" device.login %}">{% trans "Regenerate password" %}</a></td>
+      <td><a href="{% url "granadilla:device_password" device.login %}">{% trans "Regenerate password" %}</a></td>
     </tr>
   </tbody>
 </table>

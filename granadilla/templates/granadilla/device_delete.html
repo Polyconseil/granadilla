@@ -20,7 +20,7 @@
 
 {% else %}
 <p>{% trans "This device does not exist." %}</p>
-<a href="{% url "granadilla.views.device_list" %}">{% trans "Back to the device list" %}</a>
+<a href="{% url "granadilla:device_list" %}">{% trans "Back to the device list" %}</a>
 
 {% endif %}
 

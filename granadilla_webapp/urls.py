@@ -1,16 +1,17 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 admin.autodiscover()
 
-urlpatterns = patterns('',
+urlpatterns = [
     # accounts
-    (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-    (r'^accounts/logout/$', 'django.contrib.auth.views.logout'),
+    url(r'^accounts/login/$', auth_views.login),
+    url(r'^accounts/logout/$', auth_views.logout, name='auth-logout'),
 
     # admin interface
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
     # granadilla
-    (r'', include('granadilla.urls')),
-)
+    url(r'', include('granadilla.urls')),
+]

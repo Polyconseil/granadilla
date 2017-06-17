@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth import models as auth_models
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django import test as django_test
 
 import volatildap
@@ -99,7 +99,7 @@ class DeviceTests(LdapBasedTestCase):
         self.client.login(username='jdoe', password='yay')
 
         response = self.client.get(
-            reverse('device_details', args=(device.login,)),
+            reverse('granadilla:device_details', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'granadilla/device_attr.html')
@@ -117,7 +117,7 @@ class DeviceTests(LdapBasedTestCase):
 
         self.client.login(username='jdoe', password='yay')
         response = self.client.post(
-            reverse('device_password', args=(device.login,)),
+            reverse('granadilla:device_password', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'granadilla/device_password.html')
@@ -147,7 +147,7 @@ class DeviceTests(LdapBasedTestCase):
         device2.save()
 
         self.client.login(username='jdoe', password='yay')
-        response = self.client.get(reverse('device_list'))
+        response = self.client.get(reverse('granadilla:device_list'))
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'granadilla/device_list.html')
         self.assertContains(response, 'jdoe_laptop')
@@ -177,7 +177,7 @@ class DeviceTests(LdapBasedTestCase):
         device2.save()
 
         self.client.login(username='admin', password='MAGIC!')
-        response = self.client.get(reverse('device_list'))
+        response = self.client.get(reverse('granadilla:device_list'))
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'granadilla/device_list.html')
         self.assertContains(response, 'jdoe_laptop')
@@ -198,22 +198,22 @@ class DeviceTests(LdapBasedTestCase):
         device.save()
 
         self.client.login(username='spy', password='Bond.')
-        response = self.client.get(reverse('device_list'))
+        response = self.client.get(reverse('granadilla:device_list'))
         self.assertEqual(200, response.status_code)
         self.assertTemplateUsed(response, 'granadilla/device_list.html')
         self.assertNotContains(response, 'jdoe_laptop')
 
         # No access to objects in any way.
-        response = self.client.get(reverse('device_details', args=('jdoe_laptop',)))
+        response = self.client.get(reverse('granadilla:device_details', args=('jdoe_laptop',)))
         self.assertEqual(404, response.status_code)
-        response = self.client.get(reverse('device_password', args=('jdoe_laptop',)))
+        response = self.client.get(reverse('granadilla:device_password', args=('jdoe_laptop',)))
         self.assertEqual(404, response.status_code)
 
     def test_web_add_device(self):
         # Add a device
         self.client.login(username='jdoe', password='yay')
         response = self.client.post(
-            reverse('device_create'),
+            reverse('granadilla:device_create'),
             {
                 'name': 'laptop',
             },
@@ -226,11 +226,11 @@ class DeviceTests(LdapBasedTestCase):
 
         # Create device password
         response = self.client.get(
-            reverse('device_password', args=(device.login,)),
+            reverse('granadilla:device_password', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
         response = self.client.post(
-            reverse('device_password', args=(device.login,)),
+            reverse('granadilla:device_password', args=(device.login,)),
         )
         self.assertEqual(200, response.status_code)
         device = response.context['device']
@@ -253,7 +253,7 @@ class DeviceTests(LdapBasedTestCase):
 
         # Add another device
         response = self.client.post(
-            reverse('device_create'),
+            reverse('granadilla:device_create'),
             {
                 'name': 'phone',
             },

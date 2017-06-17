@@ -18,21 +18,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
-    url(r'^$', 'granadilla.views.index'),
-    url(r'^devices/$', 'granadilla.views.device_list', name="device_list"),
-    url(r'^devices/create/$', 'granadilla.views.device_create', name="device_create"),
-    url(r'^devices/(?P<device_login>[^/]+)/$', 'granadilla.views.device_attr', name="device_details"),
-    url(r'^devices/(?P<device_login>[^/]+)/password/$', 'granadilla.views.device_password', name='device_password'),
-    url(r'^devices/(?P<device_login>[^/]+)/delete/$', 'granadilla.views.device_delete'),
-    url(r'^groups/$', 'granadilla.views.groups'),
-    url(r'^group/(?P<slug>.*)/print/$', 'granadilla.views.group_print'),
-    url(r'^group/(?P<slug>.*)/$', 'granadilla.views.group'),
-    url(r'^user/(?P<uid>.*)/card/$', 'granadilla.views.user_card'),
-    url(r'^user/(?P<uid>.*)/photo/$', 'granadilla.views.photo'),
-    url(r'^user/(?P<uid>.*)/photo/delete/$', 'granadilla.views.photo_delete'),
-    url(r'^user/(?P<uid>.*)/$', 'granadilla.views.user'),
-)
+from . import views
+
+app_name = 'granadilla'
+urlpatterns = [
+    url(r'^$', views.index, name='index'),
+    url(r'^devices/$', views.device_list, name="device_list"),
+    url(r'^devices/create/$', views.device_create, name="device_create"),
+    url(r'^devices/(?P<device_login>[^/]+)/$', views.device_attr, name="device_details"),
+    url(r'^devices/(?P<device_login>[^/]+)/password/$', views.device_password, name='device_password'),
+    url(r'^devices/(?P<device_login>[^/]+)/delete/$', views.device_delete),
+    url(r'^groups/$', views.groups, name='groups'),
+    url(r'^group/(?P<slug>.*)/print/$', views.group_print),
+    url(r'^group/(?P<slug>.*)/$', views.group),
+    url(r'^user/(?P<uid>.*)/card/$', views.user_card),
+    url(r'^user/(?P<uid>.*)/photo/$', views.photo),
+    url(r'^user/(?P<uid>.*)/photo/delete/$', views.photo_delete),
+    url(r'^user/(?P<uid>.*)/$', views.user),
+]
 

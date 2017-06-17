@@ -8,7 +8,7 @@
 {% if home %}
 {% granadilla_title %}
 {% else %}
-<a href="{% url "granadilla.views.index" %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url "granadilla.views.groups" %}">{% trans "Groups" %}</a> &rsaquo; {{ group }}
+<a href="{% url "granadilla:index" %}">{% granadilla_title %}</a> &rsaquo; <a href="{% url "granadilla:groups" %}">{% trans "Groups" %}</a> &rsaquo; {{ group }}
 {% endif %}
 {% endblock %}
 
@@ -31,7 +31,7 @@
   <tbody>
 {% for member in members %}
     <tr>
-      <td class="name"><a href="{% url "granadilla.views.user" member.pk %}">{{ member }}</a></td>
+      <td class="name"><a href="{% url "granadilla:user" member.pk %}">{{ member }}</a></td>
       <td class="phone">{{ member.phone|default_if_none:"-" }}</td>
       <td class="phone">{{ member.mobile_phone|default_if_none:"-" }}</td>
       <td class="phone">{{ member.internal_phone|default_if_none:"-" }}</td>
@@ -45,11 +45,11 @@
 {% for member in members %}
 <div class="card">
   <div class="name">
-    <a href="{% url "granadilla.views.user" member.pk %}">{{ member }}</a>
+    <a href="{% url "granadilla:user" member.pk %}">{{ member }}</a>
   </div>
   <div class="photo">
     <div class="centering">
-      <a href="{% url "granadilla.views.user" member.pk %}"><img src="{% if member.photo %}{% url "granadilla.views.photo" member.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}" alt="{{ member }}" /></a>
+      <a href="{% url "granadilla:user" member.pk %}"><img src="{% if member.photo %}{% url "granadilla:photo" member.pk %}{% else %}{% granadilla_media 'img/unknown.png' %}{% endif %}" alt="{{ member }}" /></a>
     </div>
   </div>
   {% if member.mobile_phone %}
@@ -71,9 +71,9 @@
 {% block links %}
 <li class="phonebook-image">
 {% if printable %}
-  <a href="{% url "granadilla.views.group" group.name %}">{% trans "Show photos" %}</a>
+  <a href="{% url "granadilla:group" group.name %}">{% trans "Show photos" %}</a>
 {% else %}
-  <a href="{% url "granadilla.views.group_print" group.name %}">{% trans "Show list" %}</a>
+  <a href="{% url "granadilla:group_print" group.name %}">{% trans "Show list" %}</a>
 {% endif %}
 </li>
 {% endblock %}
