@@ -22,4 +22,4 @@ build/
 dist/
 htmlcov/
 MANIFEST
-
+*.mo
