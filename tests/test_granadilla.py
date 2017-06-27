@@ -9,6 +9,7 @@ from django.contrib.auth import models as auth_models
 from django.urls import reverse
 from django import test as django_test
 
+import ldap
 import volatildap
 
 from granadilla import cli
@@ -77,6 +78,27 @@ class DeviceTests(LdapBasedTestCase):
             usernames=[self.user.username],
         )
         self.group.save()
+
+    def test_manual_password_change(self):
+        dn = self.user.dn
+        old_password = 'yay'
+        new_password = 'secure'
+
+        conn = ldap.initialize(self.ldap_server.uri)
+        try:
+            conn.simple_bind_s(dn, old_password)
+            whoami = conn.whoami_s()
+            self.assertEqual(dn, whoami.replace('dn:', ''))
+            conn.passwd_s(dn, old_password, new_password)
+        finally:
+            conn.unbind_s()
+
+        conn = ldap.initialize(self.ldap_server.uri)
+        try:
+            conn.simple_bind_s(dn, new_password)
+            whoami = conn.whoami_s()
+        finally:
+            conn.unbind_s()
 
     def test_add_user_group_device(self):
 
