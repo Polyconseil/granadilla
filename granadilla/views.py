@@ -27,16 +27,18 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotModified
-from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.shortcuts import get_object_or_404, redirect, render_to_response, render
 from django.template import RequestContext
 from django.utils.http import http_date
 from django.views.static import was_modified_since
 from django.views import generic as generic_views
-
+from django.views.generic.edit import FormView
 from granadilla.templatetags.granadilla_tags import granadilla_media
-from granadilla.forms import LdapDeviceForm, LdapUserForm
+from granadilla.forms import LdapDeviceForm, LdapUserForm, LdapUserPassForm
 from . import models
 from . import vcard
+from django.contrib.messages.views import SuccessMessageMixin
+from django.utils.translation import ugettext_lazy as _
 
 
 def can_write(user, entry):
@@ -211,6 +213,39 @@ class GroupView(generic_views.DetailView):
 group = login_required(GroupView.as_view())
 
 
+class ChangePasswordView(SuccessMessageMixin, FormView):
+    """
+    function to change the user's password
+    """
+    model = models.LdapUser
+
+    template_name = 'granadilla/change_password.html'
+    form_class = LdapUserPassForm
+    success_url = '/devices'
+    success_message = "Congratulations, your password has been successfully changed."
+
+    def get_context_data(self, **kwargs):
+        context = super(ChangePasswordView, self).get_context_data(**kwargs)
+        context['form_user'] = self.get_form()
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        return super(ChangePasswordView, self).form_valid(form)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.model.objects.get(username=self.request.user.username)
+        return kwargs
+
+    def get_success_message(self, cleaned_data):
+        success_message = _(self.success_message)
+        return success_message
+
+
+ChangePassword = login_required(ChangePasswordView.as_view())
+
+
 class PrintableGroupView(GroupView):
     """
     Display a printable list of users belonging to a group.
@@ -284,11 +319,13 @@ def user(request, uid):
     else:
         form = LdapUserForm(instance=user)
 
-    return render_to_response('granadilla/user.html', RequestContext(request, {
+    context = ({
         'can_edit': can_edit,
         'object': user,
         'form': form,
-    }))
+    })
+
+    return render(request, 'granadilla/user.html', context)
 
 
 @login_required

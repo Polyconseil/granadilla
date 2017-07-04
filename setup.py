@@ -31,6 +31,9 @@ setup(
         # Configuration
         'django-appconf',
         'getconf>=1.2.0',
+        'django-zxcvbn-password>=2.0.0',
+        'django-password-strength>=1.2.1',
+
 
         # Passwords
         'smbpasswd',

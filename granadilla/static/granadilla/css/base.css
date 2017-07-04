@@ -35,7 +35,7 @@ input {
 /* header */
 #header {
   background: white;
-  height: 72px; 
+  height: 72px;
   width: 100%;
   border-bottom: 1px solid #ccc;
 }
@@ -172,26 +172,122 @@ input {
 }
 
 .message {
-    background: #9f9;
-    padding: 0.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    border: 1px solid #555;
-    font-weight: bold;
+  background: #9f9;
+  padding: 0.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  border: 1px solid #555;
+  font-weight: bold;
 }
 
 .error {
-    background: #f99;
-    padding: 0.5em;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    border: 1px solid #555;
-    font-weight: bold;
+  background: #f99;
+  padding: 0.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  border: 1px solid #555;
+  font-weight: bold;
 }
 
 .box {
-    background: #eee;
-    border: 1px solid black;
-    padding: 1em;
+  background: #eee;
+  border: 1px solid black;
+  padding: 1em;
 }
 
+/* Password */
+
+.modulpass ul {
+  list-style:square inside;
+  padding: 0px;
+  margin: 0px;
+}
+
+.modulepass th {
+  height: 90px;
+  width: 150px;
+}
+
+.modulepass {
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 0;
+  margin-bottom: 3px;
+  width: 100%;
+}
+
+.text-muted{
+  float: right;
+}
+
+.modulepass {
+  margin: auto;
+  width:720px;
+}
+
+.modulepass caption {
+  background: #7ca0c7;
+  background: -moz-linear-gradient(top, #bcd2e9, #7ba0c6);
+  background: -webkit-gradient(linear, left top, left bottom, from(#bcd2e9), to(#7ba0c6));
+  color:white;
+  font-size:1em;
+  font-weight:normal;
+  margin:0;
+  padding:2px 4px;
+  text-align:center;
+}
+
+.progress-bloc{
+  width: 45%;
+  float: right;
+  margin-right: 80px;
+
+  padding-top: 0px;
+}
+
+.password_strength_info label{
+  margin-left: 200px;
+}
+.password_strength_info{
+  margin-right: 15%;
+}
+
+.text-muted{
+  height: 0px;
+  margin-left: 0px;
+}
+
+label[for=id_new_pass_1]{
+  padding-top: 0px;
+  padding-left: 4%;
+}
+
+label[for=id_new_pass_2]{
+  padding-top: 9px;
+  padding-left: 5%;
+}
+
+label[for=id_current_pass]{
+  padding-left: 5%;
+}
+
+#id_current_pass{
+  width: 35%;
+  margin-left: 13px;
+}
+
+#id_new_pass_1{
+  width: 35%;
+  margin-left: 13px;
+}
+
+#id_new_pass_2{
+  width: 35%;
+  margin-left: 13px;
+}
+
+#buttonpassword{
+  margin-left: 10px;
+  margin-bottom: 12px;
+  margin-top: 5px;
+}

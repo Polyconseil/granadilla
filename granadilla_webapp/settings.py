@@ -73,6 +73,8 @@ INSTALLED_APPS = (
     'granadilla',
     'papaya.server',
     'granadilla_webapp.web',
+    'zxcvbn_password',
+    'django_password_strength',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -120,6 +122,22 @@ DATABASES = {
         'PASSWORD': config.getstr('ldap.webapp_bind_pw'),
     },
 }
+
+AUTH_PASSWORD_VALIDATORS = [{
+    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+}, {
+    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+}, {
+    'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+}, {
+    'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+}, {
+    'NAME': 'zxcvbn_password.ZXCVBNValidator',
+    'OPTIONS': {
+        'min_score': 3,
+        'user_attributes': ('username', 'email', 'first_name', 'last_name')
+    }
+}]
 
 DATABASE_ROUTERS = ['ldapdb.router.Router']
 

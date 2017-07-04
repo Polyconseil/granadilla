@@ -20,7 +20,9 @@
 
 from . import models
 from django import forms
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
+
+from zxcvbn_password.fields import PasswordField, PasswordConfirmationField
 
 
 class LdapDeviceForm(forms.Form):
@@ -74,3 +76,26 @@ class LdapUserForm(forms.ModelForm):
     class Meta:
         model = models.LdapUser
         fields = ('phone', 'mobile_phone', 'internal_phone', 'new_photo')
+
+
+class LdapUserPassForm(forms.Form):
+    current_pass = forms.CharField(label='Current password', max_length=150, widget=forms.PasswordInput())
+    new_pass_1 = PasswordField()
+    new_pass_2 = PasswordConfirmationField(confirm_with='new_pass_1')
+
+    def clean(self):
+        cleaned_data = super(LdapUserPassForm, self).clean()
+        new_pass_1 = cleaned_data.get("new_pass_1")
+        if new_pass_1 is not None:
+            if not self.user.check_password(self.cleaned_data['current_pass']):
+                raise forms.ValidationError("Invalid Password!")
+        return cleaned_data
+
+    def save(self):
+        self.user.set_password(self.cleaned_data['new_pass_2'])
+        self.user.save()
+        return self.user
+
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)

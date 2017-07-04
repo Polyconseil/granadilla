@@ -30,6 +30,8 @@ import unicodedata
 from .conf import settings
 from django.utils.translation import ugettext_lazy as _
 
+from django.utils.crypto import constant_time_compare
+
 from ldapdb import models as ldap_models
 from ldapdb.models import fields as ldap_fields
 
@@ -106,7 +108,6 @@ class LdapGroup(ldap_models.Model):
 
     def save(self, *args, **kwargs):
         res = super(LdapGroup, self).save(*args, **kwargs)
-
         try:
             device_group = LdapDeviceGroup.objects.get(group_dn=self.dn)
         except LdapDeviceGroup.DoesNotExist:
@@ -217,6 +218,10 @@ class LdapUser(ldap_models.Model):
 
     def __str__(self):
         return self.username
+
+    def check_password(self, password):
+        expected_hash = hash_password(password)
+        return constant_time_compare(expected_hash, self.password)
 
     def set_password(self, password):
         self.password = hash_password(password)

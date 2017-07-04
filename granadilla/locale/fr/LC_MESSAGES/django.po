@@ -163,3 +163,15 @@ msgstr "Télécharger"
 #: templatetags/granadilla_tags.py:35
 msgid "Phonebook"
 msgstr "Annuaire"
+
+#: templates/granadilla/user_password.html:7
+msgid "Password change"
+msgstr "Changement de mot de passe"
+
+#templates/granadilla/user_password.html:24
+msgid "Change password"
+msgstr "Changer mot de passe"
+
+#: view.py:242
+msgid "Note: Congratulations, your password has been successfully changed!"
+msgstr "Note: Féliciation, votre mot de passe a bien été modifié!"
