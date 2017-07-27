@@ -65,7 +65,7 @@ def check_password_strength(candidate, blacklist):
     check = zxcvbn.zxcvbn(candidate, user_inputs=blacklist)
     crack_time_display = check['crack_times_display']['offline_slow_hashing_1e4_per_second']
 
-    if check['score'] < settings.ZXCVBN_PASSWORD_MIN_SCORE:
+    if check['score'] < settings.GRANADILLA_ZXCVBN_PASSWORD_MIN_SCORE:
         return PasswordCheckResult(
             good=False,
             message=_("Password is too weak (bruteforce: %s)") % crack_time_display,
