@@ -101,7 +101,7 @@ class CLI(object):
             self.error("Passwords do not match, try again.")
             return None
 
-        check = models.check_password_strength(password1, user_inputs=blacklist)
+        check = models.check_password_strength(password1, blacklist=blacklist)
         if check.good:
             self.success(str(check.message))
             return password1
