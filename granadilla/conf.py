@@ -57,6 +57,9 @@ class GranadillaConf(appconf.AppConf):
     USERS_HOME = '/home'
     USERS_SHELL = '/bin/bash'
 
+    # Password
+    ZXCVBN_PASSWORD_MIN_SCORE = 3
+
     # Samba
     USE_SAMBA = False
     SAMBA_PREFIX = 'S-1-0-0'

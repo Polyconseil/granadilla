@@ -89,6 +89,12 @@ class LdapUserPassForm(forms.Form):
         if new_pass_1 is not None:
             if not self.user.check_password(self.cleaned_data['current_pass']):
                 raise forms.ValidationError("Invalid Password!")
+        check = models.check_password_strength(
+            new_pass_1,
+            [self.user.username, self.user.first_name, self.user.last_name],
+        )
+        if not check.good:
+            raise forms.ValidationError(str(check.message))
         return cleaned_data
 
     def save(self):

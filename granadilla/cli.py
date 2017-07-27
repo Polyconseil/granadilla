@@ -33,8 +33,6 @@ import time
 import re
 import sys
 
-import zxcvbn
-
 
 django.setup()
 
@@ -64,8 +62,6 @@ def command(fun):
 
 
 class CLI(object):
-
-    PASSWORD_MIN_SCORE = 3
 
     def _write(self, txt, args, color=colorama.Fore.RESET, target=sys.stdout):
         txt = txt % args
@@ -105,16 +101,13 @@ class CLI(object):
             self.error("Passwords do not match, try again.")
             return None
 
-        check = zxcvbn.zxcvbn(password1, user_inputs=blacklist)
-        if check['score'] < self.PASSWORD_MIN_SCORE:
-            self.error("Password is too weak (bruteforce: %s)", check['crack_time_display'])
+        check = models.check_password_strength(password1, user_inputs=blacklist)
+        if check.good:
+            self.success(str(check.message))
+            return password1
+        else:
+            self.error(str(check.message))
             return None
-
-        self.success(
-            "Password is strong enough (bruteforce: %s)",
-            check['crack_times_display']['offline_slow_hashing_1e4_per_second'],
-        )
-        return password1
 
     def grab(self, prompt, password=False):
 

@@ -19,6 +19,7 @@
 #
 
 import base64
+import collections
 import hashlib
 
 import logging
@@ -26,6 +27,8 @@ import os
 import time
 import random
 import unicodedata
+
+import zxcvbn
 
 from .conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -53,6 +56,25 @@ def hash_password(password):
 def random_password(length=32):
     allowed_chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     return ''.join([random.choice(allowed_chars) for i in range(length)])
+
+
+PasswordCheckResult = collections.namedtuple('PasswordCheckResult', ['good', 'message'])
+
+
+def check_password_strength(candidate, blacklist):
+    check = zxcvbn.zxcvbn(candidate, user_inputs=blacklist)
+    crack_time_display = check['crack_time_display']['offline_slow_hashing_1e4_per_second']
+
+    if check['score'] < settings.ZXCVBN_PASSWORD_MIN_SCORE:
+        return PasswordCheckResult(
+            good=False,
+            message=_("Password is too weak (bruteforce: %s)") % crack_time_display,
+        )
+    else:
+        return PasswordCheckResult(
+            good=True,
+            message=_("Password is strong enough (bruteforce: %s)") % crack_time_display,
+        )
 
 
 class LdapAcl(ldap_models.Model):
