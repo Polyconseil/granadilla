@@ -36,7 +36,6 @@ setup(
 
 
         # Passwords
-        'smbpasswd',
         'zxcvbn-python',
 
         # Command line

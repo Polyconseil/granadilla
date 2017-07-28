@@ -58,6 +58,10 @@ def random_password(length=32):
     return ''.join([random.choice(allowed_chars) for i in range(length)])
 
 
+def nthash(cleartext):
+    return hashlib.new('md4', cleartext.encode('utf-16le')).hexdigest().upper()
+
+
 PasswordCheckResult = collections.namedtuple('PasswordCheckResult', ['good', 'message'])
 
 
@@ -248,9 +252,8 @@ class LdapUser(ldap_models.Model):
     def set_password(self, password):
         self.password = hash_password(password)
         if settings.GRANADILLA_USE_SAMBA:
-            import smbpasswd
-            self.samba_ntpassword = smbpasswd.nthash(password)
-            self.samba_lmpassword = smbpasswd.lmhash(password.encode('utf-8'))
+            self.samba_ntpassword = nthash(password)
+            self.samba_lmpassword = ''
             self.samba_pwdlastset = int(time.time())
 
     def resync_devices(self):
