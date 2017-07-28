@@ -43,10 +43,10 @@ test: build
 
 # Note: we run the linter in two runs, because our __init__.py files has specific warnings we want to exclude
 lint:
-	check-manifest
 	$(FLAKE8) --config .flake8 --exclude $(PACKAGE)/__init__.py $(PACKAGE)
 	$(FLAKE8) --config .flake8 --ignore F401 $(PACKAGE)/__init__.py
 	$(FLAKE8) --config .flake8 $(TESTS_DIR)
+	check-manifest
 
 coverage:
 	$(COVERAGE) erase
