@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import contextlib
 import io
+import os.path
 import sys
 
 from django.conf import settings
@@ -32,8 +33,9 @@ class LdapBasedTestCase(django_test.TestCase):
     @classmethod
     def setUpClass(cls):
         super(LdapBasedTestCase, cls).setUpClass()
+        SAMBA_SCHEMA = os.path.join(settings.CHECKOUT_DIR, 'dev', 'samba.schema')
         cls.ldap_server = volatildap.LdapServer(
-            schemas=['core.schema', 'cosine.schema', 'nis.schema', 'inetorgperson.schema'],
+            schemas=['core.schema', 'cosine.schema', 'nis.schema', 'inetorgperson.schema', SAMBA_SCHEMA],
         )
 
     @classmethod
@@ -303,3 +305,9 @@ class UserTests(LdapBasedTestCase):
         interface = cli.CLI()
         with replace_stdin('\n'.join(lines)):
             interface.adduser('jdoe')
+
+        user = models.LdapUser.objects.get(username='jdoe')
+        self.assertEqual("John", user.first_name)
+        self.assertEqual("Doe", user.last_name)
+        self.assertIsNotNone(user.samba_ntpassword)
+        self.assertEqual('', user.samba_lmpassword)

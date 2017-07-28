@@ -37,7 +37,7 @@ testall:
 	tox
 
 test: build
-	PYTHONPATH=. python -Wdefault manage.py test $(TESTS_DIR)
+	PYTHONPATH=. GRANADILLA_CONFIG=test_settings.ini python -Wdefault manage.py test $(TESTS_DIR)
 
 
 
