@@ -168,7 +168,7 @@ msgstr "Annuaire"
 msgid "Password change"
 msgstr "Changement de mot de passe"
 
-#templates/granadilla/user_password.html:24
+#: templates/granadilla/user_password.html:24
 msgid "Change password"
 msgstr "Changer mot de passe"
 
