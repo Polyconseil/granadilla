@@ -37,7 +37,7 @@ setup(
 
 
         # Passwords
-        'zxcvbn-python',
+        'zxcvbn',
 
         # Command line
         'colorama',
