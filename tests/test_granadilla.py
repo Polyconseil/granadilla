@@ -49,7 +49,9 @@ class LdapBasedTestCase(django_test.TestCase):
         settings.DATABASES['ldap']['USER'] = self.ldap_server.rootdn
         settings.DATABASES['ldap']['PASSWORD'] = self.ldap_server.rootpw
         settings.DATABASES['ldap']['NAME'] = self.ldap_server.uri
-        settings.PAPAYA_LDAP_SERVER_URI = self.ldap_server.uri
+        settings.AUTH_LDAP_SERVER_URI = self.ldap_server.uri
+        settings.AUTH_LDAP_BIND_DN = self.ldap_server.rootdn
+        settings.AUTH_LDAP_BIND_PASSWORD = self.ldap_server.rootpw
         cli.CLI().init()
 
 

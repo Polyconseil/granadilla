@@ -27,6 +27,7 @@ setup(
 
         # Databases
         'django-ldapdb>=0.6.0',
+        'django-auth-ldap',
 
         # Configuration
         'django-appconf',

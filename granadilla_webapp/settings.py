@@ -10,9 +10,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 from __future__ import unicode_literals
 
+import os
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import getconf
-import os
+import ldap
+import django_auth_ldap.config as dal_config
+
 BASE_DIR = os.path.dirname(__file__)
 CHECKOUT_DIR = os.path.dirname(BASE_DIR)
 
@@ -71,7 +75,6 @@ ALLOWED_HOSTS = config.getlist('django.allowed_hosts')
 
 INSTALLED_APPS = (
     'granadilla',
-    'papaya.server',
     'granadilla_webapp.web',
     'zxcvbn_password',
     'django_password_strength',
@@ -95,7 +98,7 @@ MIDDLEWARE = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'papaya.backends.ldapauth.LdapBackend',
+    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -208,6 +211,20 @@ GRANADILLA_SAMBA_PREFIX = config.getstr('granadilla.samba_prefix', 'S-1-0-0')
 GRANADILLA_MEDIA_PREFIX = os.path.join(STATIC_URL, 'granadilla')
 
 
-PAPAYA_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
-PAPAYA_LDAP_GROUPS_DN = GRANADILLA_GROUPS_DN
-PAPAYA_LDAP_USERS_DN = GRANADILLA_USERS_DN
+AUTH_LDAP_SERVER_URI = DATABASES['ldap']['NAME']
+AUTH_LDAP_BIND_DN = DATABASES['ldap']['USER']
+AUTH_LDAP_BIND_PASSWORD = DATABASES['ldap']['PASSWORD']
+AUTH_LDAP_USER_DN_TEMPLATE = 'uid=%(user)s,' + GRANADILLA_USERS_DN
+# Populate Django from the LDAP
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'givenName',
+    'last_name': 'sn',
+    'email': 'mail',
+}
+AUTH_LDAP_GROUP_SEARCH = dal_config.LDAPSearch(
+    GRANADILLA_GROUPS_DN,
+    ldap.SCOPE_SUBTREE,
+    '(objectClass=posixGroup)',
+)
+AUTH_LDAP_GROUP_TYPE = dal_config.PosixGroupType()
+AUTH_LDAP_MIRROR_GROUPS = True
