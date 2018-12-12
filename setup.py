@@ -23,7 +23,7 @@ setup(
     long_description=read('README.rst'),
     install_requires=[
         # Django core
-        'Django>=1.11,<2.0',
+        'Django>=2.1,<3.0',
 
         # Databases
         'django-ldapdb>=0.6.0',

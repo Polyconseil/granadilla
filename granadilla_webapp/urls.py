@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = [
     # accounts
-    url(r'^accounts/login/$', auth_views.login),
-    url(r'^accounts/logout/$', auth_views.logout, name='auth-logout'),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view()),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(), name='auth-logout'),
 
     # admin interface
     url(r'^admin/', admin.site.urls),
