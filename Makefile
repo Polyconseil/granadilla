@@ -40,6 +40,9 @@ test: build
 	PYTHONPATH=. GRANADILLA_CONFIG=test_settings.ini python -Wdefault manage.py test $(TESTS_DIR)
 
 
+release:
+	fullrelease
+
 
 # Note: we run the linter in two runs, because our __init__.py files has specific warnings we want to exclude
 lint:

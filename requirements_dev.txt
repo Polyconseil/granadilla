@@ -5,3 +5,6 @@ volatildap
 # For tests
 check_manifest
 flake8
+
+# For release
+zest.releaser[recommended]
