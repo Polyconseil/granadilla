@@ -314,7 +314,7 @@ class CLI(object):
         # create default group
         try:
             models.LdapGroup.objects.get(name=settings.GRANADILLA_USERS_GROUP)
-        except:
+        except models.LdapGroup.DoesNotExist:
             self.addgroup(settings.GRANADILLA_USERS_GROUP)
 
     @command

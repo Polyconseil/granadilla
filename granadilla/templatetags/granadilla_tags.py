@@ -33,7 +33,7 @@ register = Library()
 def granadilla_title():
     try:
         return settings.GRANADILLA_TITLE
-    except:
+    except AttributeError:
         return _("Phonebook")
 
 
@@ -57,10 +57,10 @@ def granadilla_media(medium):
     """
     try:
         prefix = settings.GRANADILLA_MEDIA_PREFIX
-    except:
+    except AttributeError:
         try:
             prefix = os.path.join(settings.STATIC_URL, 'granadilla')
-        except:
+        except AttributeError:
             prefix = os.path.join(settings.MEDIA_URL, 'granadilla')
     return os.path.join(prefix, medium)
 
