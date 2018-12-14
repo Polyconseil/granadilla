@@ -20,8 +20,6 @@ matrix:
       env: TOXENV=py35-django2
     - python: "3.6"
       env: TOXENV=py36-django2
-    - python: "3.7"
-      env: TOXENV=py37-django2
 
     # Linting
     - python: "3.6"
