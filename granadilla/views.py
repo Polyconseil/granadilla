@@ -38,7 +38,7 @@ from granadilla.forms import LdapDeviceForm, LdapUserForm, LdapUserPassForm
 from . import models
 from . import vcard
 from django.contrib.messages.views import SuccessMessageMixin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 def can_write(user, entry):
