@@ -18,24 +18,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 app_name = 'granadilla'
 urlpatterns = [
-    url(r'^$', views.index, name='index'),
-    url(r'^devices/$', views.device_list, name="device_list"),
-    url(r'^devices/create/$', views.device_create, name="device_create"),
-    url(r'^devices/(?P<device_login>[^/]+)/$', views.device_attr, name="device_details"),
-    url(r'^devices/(?P<device_login>[^/]+)/password/$', views.device_password, name='device_password'),
-    url(r'^devices/(?P<device_login>[^/]+)/delete/$', views.device_delete),
-    url(r'^groups/$', views.groups, name='groups'),
-    url(r'^group/(?P<slug>.*)/print/$', views.group_print, name='group_print'),
-    url(r'^group/(?P<slug>.*)/$', views.group, name='group'),
-    url(r'^user/(?P<uid>.*)/card/$', views.user_card, name='user_card'),
-    url(r'^user/(?P<uid>.*)/photo/$', views.photo),
-    url(r'^user/(?P<uid>.*)/photo/delete/$', views.photo_delete),
-    url(r'^user/(?P<uid>.*)/$', views.user, name='user'),
-    url(r'^password/$', views.ChangePassword, name='change_password'),
+    path('', views.index, name='index'),
+    path('devices/', views.device_list, name="device_list"),
+    path('devices/create/', views.device_create, name="device_create"),
+    re_path(r'^devices/(?P<device_login>[^/]+)/$', views.device_attr, name="device_details"),
+    re_path(r'^devices/(?P<device_login>[^/]+)/password/$', views.device_password, name='device_password'),
+    re_path(r'^devices/(?P<device_login>[^/]+)/delete/$', views.device_delete),
+    path('groups/', views.groups, name='groups'),
+    re_path(r'^group/(?P<slug>.*)/print/$', views.group_print, name='group_print'),
+    re_path(r'^group/(?P<slug>.*)/$', views.group, name='group'),
+    re_path(r'^user/(?P<uid>.*)/card/$', views.user_card, name='user_card'),
+    re_path(r'^user/(?P<uid>.*)/photo/$', views.photo),
+    re_path(r'^user/(?P<uid>.*)/photo/delete/$', views.photo_delete),
+    re_path(r'^user/(?P<uid>.*)/$', views.user, name='user'),
+    path('password/', views.ChangePassword, name='change_password'),
 ]
