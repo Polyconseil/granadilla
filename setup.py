@@ -80,9 +80,6 @@ setup(
     cmdclass={'build_py': BuildWithMakefile},
     include_package_data=True,
     install_requires=[
-        # Django core
-        'Django>=2.1,<3.0',
-
         # Databases
         'django-ldapdb>=0.6.0',
         'django-auth-ldap',
