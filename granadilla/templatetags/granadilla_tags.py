@@ -22,7 +22,7 @@ import os.path
 
 from django.conf import settings
 from django.template import Library
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 import granadilla
 
