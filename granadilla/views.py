@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotModified
-from django.shortcuts import get_object_or_404, redirect, render_to_response, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.template import RequestContext
 from django.utils.http import http_date
 from django.views.static import was_modified_since
@@ -296,7 +296,7 @@ def photo_delete(request, uid):
         user.save()
         return redirect(reverse(index))
     else:
-        return render_to_response('granadilla/photo_delete.html', RequestContext(request, {
+        return render(request, 'granadilla/photo_delete.html', RequestContext(request, {
             'object': user,
         }))
 
