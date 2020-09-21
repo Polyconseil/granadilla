@@ -30,6 +30,9 @@ def replace_stdin(contents):
 
 
 class LdapBasedTestCase(django_test.TestCase):
+
+    databases = ['default', 'ldap']
+
     @classmethod
     def setUpClass(cls):
         super(LdapBasedTestCase, cls).setUpClass()
