@@ -8,4 +8,4 @@ graft granadilla_webapp
 
 global-exclude *.py[cod] __pycache__ *.swp *.mo
 
-include *_settings.ini granadilla-admin Makefile manage.py tox.ini .flake8 .travis.yml
+include example_settings.ini test_settings.ini granadilla-admin Makefile manage.py tox.ini .flake8 .travis.yml
