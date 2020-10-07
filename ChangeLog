@@ -4,7 +4,7 @@ ChangeLog
 0.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Passage à Django 3
 
 
 0.7.0 (2018-12-14)
