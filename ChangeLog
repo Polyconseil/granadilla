@@ -1,7 +1,7 @@
 ChangeLog
 ---------
 
-0.7.2 (unreleased)
+0.7.2 (2020-10-13)
 ------------------
 
 - Ré-utilisation de la lib `django-ldapdb` au lieu de la lib temporaire de remplacement `polyconseil-django-ldapdb`.
