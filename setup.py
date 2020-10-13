@@ -81,7 +81,7 @@ setup(
     include_package_data=True,
     install_requires=[
         # Databases
-        'polyconseil-django-ldapdb',  # TODO (jroelandt): replace with django-ldabdp when it supports Django 3"
+        'django-ldapdb',
         'django-auth-ldap',
 
         # Configuration
